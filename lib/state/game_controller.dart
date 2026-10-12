@@ -7,7 +7,7 @@ import '../game/puzzle.dart';
 import '../l10n/strings.dart';
 import '../services/ads_service.dart';
 import '../services/billing_service.dart';
-import '../services/points_service.dart';
+import '../services/game_settings.dart';
 import '../services/remote_content_service.dart';
 import '../services/share_service.dart';
 import '../services/stats_service.dart';
@@ -19,19 +19,16 @@ enum GameMode { daily, practice }
 /// board rows, evaluations, keyboard colors, hints, and persistence.
 ///
 /// A [GameController] is created per puzzle: daily (bound to a calendar
-/// date AND a slot 0..4 — five puzzles per day) or practice (random word).
-/// Finished daily games are saved so the share dialog, stats and countdown
-/// survive app restarts. Daily wins credit $0.05 to the points wallet,
-/// exactly once per puzzle.
+/// date) or practice (random word). Finished daily games are saved so the
+/// share dialog, stats and countdown survive app restarts.
 class GameController extends ChangeNotifier {
   GameController({
     required this.repo,
     required this.mode,
     DateTime? date, // only for daily (archive support)
-    this.slot = 0, // daily puzzle slot 0..(puzzlesPerDay-1)
   })  : _date = date ?? DateTime.now(),
         _answer = mode == GameMode.daily
-            ? repo.dailyAnswerForSlot(slot, date ?? DateTime.now())
+            ? repo.dailyAnswer(date ?? DateTime.now())
             : repo.randomAnswer() {
     _answerLetters = repo.answerLetters(_answer);
     _loadSaved();
@@ -41,20 +38,11 @@ class GameController extends ChangeNotifier {
   final GameMode mode;
   final DateTime _date;
 
-  /// Daily puzzle slot 0..(puzzlesPerDay-1). Ignored in practice mode.
-  final int slot;
-
   late final String _answer;
   late final List<String> _answerLetters;
   String get answer => _answer;
   int get puzzleNumber => Puzzle.dayNumber(_date);
-
-  /// Plain calendar key (for stats/streaks, shared by all 5 daily slots).
-  String get calendarDateKey => Puzzle.dateKey(_date);
-
-  /// Slot-specific key (for save games: 5 puzzles never overwrite
-  /// each other).
-  String get dateKey => '${Puzzle.dateKey(_date)}_$slot';
+  String get dateKey => Puzzle.dateKey(_date);
 
   final List<String> rows = []; // submitted guesses (normalized)
   final List<List<LetterState>> evaluations = [];
@@ -76,18 +64,6 @@ class GameController extends ChangeNotifier {
   // ---------------------------------------------------------- storage --
   String get _saveKey =>
       'game_${repo.lang.name}_${mode.name}_${mode == GameMode.daily ? dateKey : _answer}';
-
-  /// Save key for a daily puzzle slot (used by the home screen to show
-  /// which of today's 5 puzzles are already done).
-  static String dailySaveKey(AppLang lang, DateTime date, int slot) =>
-      'game_${lang.name}_${GameMode.daily.name}_${Puzzle.dateKey(date)}_$slot';
-
-  /// True when today's puzzle [slot] for [lang] was finished.
-  static bool isSlotDoneToday(AppLang lang, int slot) {
-    final j = StorageService.instance
-        .getJson(dailySaveKey(lang, DateTime.now(), slot));
-    return (j?['done'] as bool?) ?? false;
-  }
 
   void _loadSaved() {
     if (mode != GameMode.daily) return;
@@ -156,26 +132,55 @@ class GameController extends ChangeNotifier {
       notifyListeners();
       return;
     }
+    // Hard mode: revealed hints must be reused.
+    if (GameSettings.instance.hardMode) {
+      final violation = _hardModeViolation(guess);
+      if (violation != null) {
+        _toast = violation == 'green'
+            ? s.get('hardModeGreen')
+            : s.get('hardModeYellow');
+        notifyListeners();
+        return;
+      }
+    }
     rows.add(guess);
-    final ev = evaluateGuess(_split(guess), _answerLetters);
-    evaluations.add(ev);
+    evaluations.add(evaluateGuess(_split(guess), _answerLetters));
     current = '';
     _rebuildKeyStates();
-    if (isFinished) {
-      // Win/loss get the result dialog; no toast needed.
-      _toast = null;
-    } else {
-      // Explicit feedback after every wrong guess: how many letters are
-      // exact vs misplaced, so players always know what happened.
-      final correct = ev.where((e) => e == LetterState.correct).length;
-      final present = ev.where((e) => e == LetterState.present).length;
-      _toast = s.guessFeedback(correct, present);
-    }
+    _toast = null;
     notifyListeners();
     await _save();
     if (isFinished) {
       await _onFinished();
     }
+  }
+
+  /// Hard mode check: returns 'green' if a green letter is misplaced,
+  /// 'yellow' if a yellow letter is missing, null if the guess is valid.
+  String? _hardModeViolation(String guess) {
+    final guessLetters = _split(guess);
+    // Collect required letters from previous evaluations.
+    final requiredPositions = <int, String>{}; // pos -> letter (green)
+    final requiredLetters = <String>{}; // letters that must appear (yellow)
+    for (var r = 0; r < rows.length; r++) {
+      final letters = _split(rows[r]);
+      for (var i = 0; i < letters.length; i++) {
+        if (evaluations[r][i] == LetterState.correct) {
+          requiredPositions[i] = letters[i];
+        } else if (evaluations[r][i] == LetterState.present) {
+          requiredLetters.add(letters[i]);
+        }
+      }
+    }
+    // Green letters must stay in position.
+    for (final e in requiredPositions.entries) {
+      if (guessLetters[e.key] != e.value) return 'green';
+    }
+    // Yellow letters must appear somewhere.
+    for (final letter in requiredLetters) {
+      if (!guessLetters.contains(letter)) return 'yellow';
+    }
+    return null;
   }
 
   void _rebuildKeyStates() {
@@ -191,10 +196,6 @@ class GameController extends ChangeNotifier {
 
   bool _finishedNotified = false;
 
-  /// True when this win freshly credited $0.05 (used by the result dialog).
-  bool _justEarned = false;
-  bool get justEarned => _justEarned;
-
   Future<void> _onFinished() async {
     if (_finishedNotified) return;
     _finishedNotified = true;
@@ -203,13 +204,8 @@ class GameController extends ChangeNotifier {
       won: isWon,
       guesses: rows.length,
       isDaily: mode == GameMode.daily,
-      dateKey: mode == GameMode.daily ? calendarDateKey : null,
+      dateKey: mode == GameMode.daily ? dateKey : null,
     );
-    // $0.05 per daily win, credited exactly once per puzzle. Practice
-    // games never earn (otherwise the reward could be farmed).
-    if (mode == GameMode.daily && isWon) {
-      _justEarned = await PointsService.instance.awardDailyWin(_saveKey);
-    }
     notifyListeners();
     // Interstitial: at most once/day, only after the daily puzzle ends,
     // never in the middle of a game. Practice mode never triggers it.
