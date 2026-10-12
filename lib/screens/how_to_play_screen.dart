@@ -199,6 +199,12 @@ class HowToPlayScreen extends StatelessWidget {
                     const TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),
             const SizedBox(height: 4),
             Text(s.get('how3b'), style: const TextStyle(fontSize: 15)),
+            const SizedBox(height: 14),
+            Text(s.get('earnT'),
+                style:
+                    const TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),
+            const SizedBox(height: 4),
+            Text(s.get('earnB'), style: const TextStyle(fontSize: 15)),
             const SizedBox(height: 24),
             SizedBox(
               width: double.infinity,
