@@ -276,10 +276,10 @@ class S {
       'Gana recompensas reales'
     ],
     'earnB': [
-      'Win any of the 5 daily puzzles to earn \$0.05. Each puzzle pays only once — practice games earn nothing. Withdraw once your balance reaches \$5.00. Premium: 20 daily puzzles — \$10 for 3 months, \$15 for 6 months.',
-      'روز کی 5 پہیلیوں میں سے کوئی بھی جیتیں اور \$0.05 کمائیں۔ ہر پہیلی پر صرف ایک بار انعام ملتا ہے — مشق والے کھیل پر کچھ نہیں ملتا۔ بیلنس \$5.00 ہو جائے تو رقم نکلوا سکتے ہیں۔ پریمیم: روز 20 پہیلیاں — 3 ماہ \$10، 6 ماہ \$15۔',
-      'اربح أيًّا من الألغاز اليومية الخمسة لتحصل على \$0.05. كل لغز يدفع مرة واحدة فقط — ألعاب التدريب لا تمنح شيئًا. يمكنك السحب عندما يصل رصيدك إلى \$5.00. المميز: 20 لغزًا يوميًا — \$10 لثلاثة أشهر، \$15 لستة أشهر.',
-      'Gana cualquiera de los 5 puzzles diarios y recibe \$0.05. Cada puzzle paga una sola vez — la práctica no da recompensa. Podrás retirar cuando tu saldo llegue a \$5.00. Premium: 20 puzzles diarios — \$10 por 3 meses, \$15 por 6 meses.'
+      'Win any of the 5 daily puzzles to earn \$0.05. Each puzzle pays only once \u2014 practice games earn nothing. Cash rewards are limited to 5 wins per day for everyone. Withdraw once your balance reaches \$5.00. Premium (\$10/3 months, \$15/6 months): 20 daily puzzles, no ads, extra hints \u2014 cash rewards stay capped at 5/day.',
+      'روز کی 5 پہیلیوں میں سے کوئی بھی جیتیں اور \$0.05 کمائیں۔ ہر پہیلی پر صرف ایک بار انعام ملتا ہے — مشق والے کھیل پر کچھ نہیں ملتا۔ کیش انعام سب کے لیے روزانہ 5 جیت تک محدود ہے۔ بیلنس \$5.00 ہو جائے تو رقم نکلوا سکتے ہیں۔ پریمیم (3 ماہ \$10، 6 ماہ \$15): روز 20 پہیلیاں، بغیر اشتہار، اضافی اشارے — کیش انعام پھر بھی 5/روز تک۔',
+      'اربح أيًّا من الألغاز اليومية الخمسة لتحصل على \$0.05. كل لغز يدفع مرة واحدة فقط — ألعاب التدريب لا تمنح شيئًا. المكافآت النقدية محدودة بـ 5 انتصارات يوميًا للجميع. يمكنك السحب عندما يصل رصيدك إلى \$5.00. المميز (\$10/3 أشهر، \$15/6 أشهر): 20 لغزًا يوميًا، بلا إعلانات، تلميحات إضافية — وتبقى المكافآت النقدية محدودة بـ 5/يوم.',
+      'Gana cualquiera de los 5 puzzles diarios y recibe \$0.05. Cada puzzle paga una sola vez — la práctica no da recompensa. Las recompensas en efectivo están limitadas a 5 victorias al día para todos. Podrás retirar cuando tu saldo llegue a \$5.00. Premium (\$10/3 meses, \$15/6 meses): 20 puzzles diarios, sin anuncios, más pistas — las recompensas siguen limitadas a 5/día.'
     ],
     'exampleWord': ['A sample word', 'مثال کے طور پر', 'كلمة للتوضيح', 'Palabra de ejemplo'],
     'version': ['Version', 'ورژن', 'الإصدار', 'Versión'],
