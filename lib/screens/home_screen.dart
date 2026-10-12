@@ -4,7 +4,9 @@ import '../config/app_config.dart';
 import '../game/puzzle.dart';
 import '../l10n/strings.dart';
 import '../main.dart';
+import '../services/points_service.dart';
 import '../services/stats_service.dart';
+import '../state/game_controller.dart';
 import 'archive_screen.dart';
 import 'game_screen.dart';
 import 'how_to_play_screen.dart';
@@ -91,21 +93,31 @@ class HomeScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 22),
-                // Play daily
-                SizedBox(
-                  width: double.infinity,
-                  child: FilledButton.icon(
-                    icon: const Icon(Icons.play_arrow_rounded, size: 28),
-                    label: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      child: Text(s.get('playDaily'),
-                          style: const TextStyle(fontSize: 20)),
-                    ),
-                    onPressed: () => Navigator.of(context).push(
-                      MaterialPageRoute(
-                          builder: (_) => const GameScreen.daily()),
-                    ),
+                // Points balance (tappable → wallet history)
+                _BalancePill(s: s),
+                const SizedBox(height: 16),
+                // Five daily puzzles
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    s.get('dailyPuzzles'),
+                    style: const TextStyle(
+                        fontSize: 16, fontWeight: FontWeight.w700),
                   ),
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    for (var i = 0; i < Puzzle.puzzlesPerDay; i++)
+                      Expanded(
+                        child: Padding(
+                          padding: EdgeInsets.only(
+                              right:
+                                  i == Puzzle.puzzlesPerDay - 1 ? 0 : 8),
+                          child: _PuzzleSlotButton(slot: i),
+                        ),
+                      ),
+                  ],
                 ),
                 const SizedBox(height: 12),
                 // Practice
@@ -172,4 +184,111 @@ class HomeScreen extends StatelessWidget {
       ),
     );
   }
+}
+
+/// One of the five daily puzzle slots. Shows a green check once done.
+class _PuzzleSlotButton extends StatelessWidget {
+  const _PuzzleSlotButton({required this.slot});
+  final int slot;
+
+  @override
+  Widget build(BuildContext context) {
+    final appState = context.watch<AppState>();
+    final done = GameController.isSlotDoneToday(appState.lang, slot);
+    final scheme = Theme.of(context).colorScheme;
+    return FilledButton(
+      style: FilledButton.styleFrom(
+        backgroundColor:
+            done ? const Color(0xFF4C9A52) : scheme.primary,
+        padding: const EdgeInsets.symmetric(vertical: 14),
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+      onPressed: () => Navigator.of(context).push(
+        MaterialPageRoute(builder: (_) => GameScreen.daily(slot: slot)),
+      ),
+      child: Text(
+        done ? '✓' : '${slot + 1}',
+        style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800),
+      ),
+    );
+  }
+}
+
+/// Tappable balance pill showing the points wallet total.
+class _BalancePill extends StatelessWidget {
+  const _BalancePill({required this.s});
+  final S s;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return InkWell(
+      borderRadius: BorderRadius.circular(24),
+      onTap: () => _showWallet(context, s),
+      child: Container(
+        padding:
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        decoration: BoxDecoration(
+          color: scheme.surfaceContainerHighest,
+          borderRadius: BorderRadius.circular(24),
+        ),
+        child: Text(
+          '💰 ${PointsService.instance.balanceText} ${s.get('balance')}',
+          style:
+              const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+        ),
+      ),
+    );
+  }
+}
+
+void _showWallet(BuildContext context, S s) {
+  final points = PointsService.instance;
+  final hist = points.history;
+  showDialog(
+    context: context,
+    builder: (ctx) => AlertDialog(
+      title: Text('💰 ${points.balanceText} ${s.get('balance')}'),
+      content: SizedBox(
+        width: double.maxFinite,
+        child: hist.isEmpty
+            ? Text(s.get('noHistory'))
+            : ListView.builder(
+                shrinkWrap: true,
+                itemCount: hist.length,
+                itemBuilder: (_, i) {
+                  final e = hist[i];
+                  final cents = (e['c'] as num?)?.toInt() ?? 0;
+                  return ListTile(
+                    dense: true,
+                    leading: const Text('🎉',
+                        style: TextStyle(fontSize: 20)),
+                    title: Text(
+                        '+\$${(cents / 100).toStringAsFixed(2)}'),
+                    subtitle: Text(_historyLabel(e)),
+                  );
+                },
+              ),
+      ),
+      actions: [
+        FilledButton(
+          onPressed: () => Navigator.of(ctx).pop(),
+          child: Text(s.get('ok')),
+        ),
+      ],
+    ),
+  );
+}
+
+/// Turns a stored puzzle key (game_<lang>_daily_YYYY-MM-DD_<slot>)
+/// into a friendly "Puzzle 3 • 2026-10-12" label.
+String _historyLabel(Map<String, dynamic> e) {
+  final k = (e['k'] as String?) ?? '';
+  final m = RegExp(r'_daily_(\d{4}-\d{2}-\d{2})_(\d+)$').firstMatch(k);
+  if (m != null) {
+    final slot = (int.tryParse(m.group(2)!) ?? 0) + 1;
+    return 'Puzzle $slot • ${m.group(1)}';
+  }
+  return (e['d'] as String?) ?? '';
 }
