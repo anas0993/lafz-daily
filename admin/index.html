@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lafz Daily — Admin Panel</title>
+<style>
+  :root { --green:#4C9A52; --gold:#C9A227; --bg:#f4f6f4; --card:#fff; --ink:#1c2b1e; --muted:#6b7a6d; --danger:#c0392b; }
+  * { box-sizing:border-box; }
+  body { font-family:'Segoe UI',system-ui,Arial,sans-serif; background:var(--bg); color:var(--ink); margin:0; }
+  .wrap { max-width:1100px; margin:0 auto; padding:24px 16px 60px; }
+  h1 { margin:0 0 4px; font-size:26px; }
+  .sub { color:var(--muted); margin:0 0 20px; }
+  .card { background:var(--card); border-radius:12px; padding:20px; box-shadow:0 2px 8px rgba(0,0,0,.06); margin-bottom:16px; }
+  .row { display:flex; gap:12px; flex-wrap:wrap; align-items:flex-end; }
+  label { display:block; font-size:13px; color:var(--muted); margin-bottom:4px; font-weight:600; }
+  input[type=text], input[type=email], input[type=password], input[type=number], input[type=time], select {
+    padding:10px 12px; border:1px solid #ccd6cd; border-radius:8px; font-size:15px; width:100%;
+  }
+  input:focus, select:focus { outline:2px solid var(--green); border-color:var(--green); }
+  button { background:var(--green); color:#fff; border:none; border-radius:8px; padding:10px 18px; font-size:15px; font-weight:600; cursor:pointer; }
+  button:hover { filter:brightness(.94); }
+  button.secondary { background:#e7ede7; color:var(--ink); }
+  button.danger { background:var(--danger); padding:6px 12px; font-size:13px; }
+  .field { min-width:180px; flex:1; }
+  .tabs { display:flex; gap:8px; margin:18px 0; }
+  .tabs button { background:#e7ede7; color:var(--ink); }
+  .tabs button.active { background:var(--ink); color:#fff; }
+  .hidden { display:none !important; }
+  .err { color:var(--danger); font-size:14px; margin-top:8px; min-height:20px; }
+  .okmsg { color:var(--green); font-size:14px; margin-top:8px; min-height:20px; }
+  .cols { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  @media (max-width:700px){ .cols{ grid-template-columns:1fr; } }
+  .wordlist { max-height:380px; overflow-y:auto; border:1px solid #e0e6e0; border-radius:8px; margin-top:8px; }
+  .wordrow { display:flex; justify-content:space-between; align-items:center; padding:7px 12px; border-bottom:1px solid #f0f3f0; font-size:16px; }
+  .wordrow:nth-child(odd){ background:#fafcfa; }
+  .wordrow.rtl { direction:rtl; }
+  .count { font-weight:700; color:var(--green); }
+  .hint { font-size:13px; color:var(--muted); margin-top:6px; }
+  .toggle { display:flex; align-items:center; gap:10px; margin:10px 0; }
+  .toggle input { width:22px; height:22px; accent-color:var(--green); }
+  header.top { display:flex; justify-content:space-between; align-items:center; }
+  .login-box { max-width:380px; margin:60px auto; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ============ LOGIN ============ -->
+  <div id="login-screen" class="card login-box">
+    <h1>🔐 Admin Login</h1>
+    <p class="sub">Lafz Daily content dashboard</p>
+    <label>Email</label>
+    <input type="email" id="email" placeholder="you@example.com" autocomplete="username">
+    <div style="height:10px"></div>
+    <label>Password</label>
+    <input type="password" id="password" placeholder="••••••••" autocomplete="current-password">
+    <div style="height:14px"></div>
+    <button id="login-btn" style="width:100%">Log in</button>
+    <div class="err" id="login-err"></div>
+    <p class="hint">Only accounts with the <b>admin</b> claim can write changes. See README.md to set it up.</p>
+  </div>
+
+  <!-- ============ APP ============ -->
+  <div id="app-screen" class="hidden">
+    <header class="top">
+      <div>
+        <h1>🟩 Lafz Daily — Admin</h1>
+        <p class="sub" id="user-line"></p>
+      </div>
+      <button class="secondary" id="logout-btn">Log out</button>
+    </header>
+
+    <div class="tabs">
+      <button id="tab-words" class="active">📝 Words</button>
+      <button id="tab-ads">📢 Ads</button>
+      <button id="tab-settings">⚙️ Settings</button>
+    </div>
+
+    <!-- ======== WORDS TAB ======== -->
+    <div id="pane-words">
+      <div class="card">
+        <div class="row">
+          <div class="field" style="max-width:260px">
+            <label>Language</label>
+            <select id="lang-select">
+              <option value="en">English</option>
+              <option value="ur">اردو (Urdu)</option>
+              <option value="ar">العربية (Arabic)</option>
+              <option value="es">Español (Spanish)</option>
+            </select>
+          </div>
+          <div class="field" style="max-width:320px">
+            <label>Search</label>
+            <input type="text" id="search" placeholder="type to filter…">
+          </div>
+        </div>
+        <p class="hint">Words you add here appear in the app <b>after it restarts</b> (they are fetched from the cloud). Daily answers are picked from the <b>Answers</b> list; the <b>Valid guesses</b> list must contain every answer too — adding a word to Answers automatically adds it to Valid guesses.</p>
+      </div>
+      <div class="cols">
+        <div class="card">
+          <h3>Answers <span class="count" id="count-answers">0</span></h3>
+          <div class="row">
+            <div class="field"><input type="text" id="add-answer" placeholder="new 5-letter word"></div>
+            <button id="add-answer-btn">Add</button>
+          </div>
+          <div class="err" id="add-answer-err"></div>
+          <div class="wordlist" id="list-answers"></div>
+        </div>
+        <div class="card">
+          <h3>Valid guesses <span class="count" id="count-guesses">0</span></h3>
+          <div class="row">
+            <div class="field"><input type="text" id="add-guess" placeholder="new 5-letter word"></div>
+            <button id="add-guess-btn">Add</button>
+          </div>
+          <div class="err" id="add-guess-err"></div>
+          <div class="wordlist" id="list-guesses"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======== ADS TAB ======== -->
+    <div id="pane-ads" class="hidden">
+      <div class="card">
+        <h3>AdMob settings</h3>
+        <div class="toggle">
+          <input type="checkbox" id="ads-enabled">
+          <label for="ads-enabled" style="margin:0;font-size:15px;color:var(--ink)">Ads enabled</label>
+        </div>
+        <div class="row">
+          <div class="field"><label>Banner ad unit ID</label><input type="text" id="ad-banner" placeholder="ca-app-pub-XXXX/YYYY"></div>
+          <div class="field"><label>Interstitial ad unit ID</label><input type="text" id="ad-inter" placeholder="ca-app-pub-XXXX/YYYY"></div>
+        </div>
+        <div style="height:12px"></div>
+        <div class="row">
+          <div class="field"><label>Rewarded ad unit ID</label><input type="text" id="ad-rewarded" placeholder="ca-app-pub-XXXX/YYYY"></div>
+          <div class="field" style="max-width:220px"><label>Max interstitials per day</label><input type="number" id="ad-max-inter" min="0" max="10"></div>
+        </div>
+        <div style="height:14px"></div>
+        <button id="save-ads-btn">💾 Save ads</button>
+        <div class="okmsg" id="ads-msg"></div>
+        <div class="err" id="ads-err"></div>
+        <p class="hint">The app ships with Google's <b>test</b> ad IDs. Paste your real IDs from <a href="https://apps.admob.com" target="_blank" rel="noopener">AdMob</a> here when you are ready to earn. Changes apply on next app restart.</p>
+      </div>
+    </div>
+
+    <!-- ======== SETTINGS TAB ======== -->
+    <div id="pane-settings" class="hidden">
+      <div class="card">
+        <h3>Game settings</h3>
+        <div class="row">
+          <div class="field" style="max-width:220px"><label>Free hints per day</label><input type="number" id="set-hints" min="0" max="10"></div>
+          <div class="field" style="max-width:220px"><label>Archive days (Pro)</label><input type="number" id="set-archive" min="1" max="365"></div>
+        </div>
+        <div style="height:12px"></div>
+        <div class="toggle">
+          <input type="checkbox" id="set-reminder">
+          <label for="set-reminder" style="margin:0;font-size:15px;color:var(--ink)">Daily reminder notification</label>
+        </div>
+        <div class="row">
+          <div class="field" style="max-width:220px"><label>Reminder time</label><input type="time" id="set-reminder-time"></div>
+        </div>
+        <div style="height:12px"></div>
+        <div class="row">
+          <div class="field"><label>Pro product ID (Play Console)</label><input type="text" id="set-pro-id" placeholder="lafz_daily_pro"></div>
+          <div class="field"><label>Pro price label</label><input type="text" id="set-pro-price" placeholder="$4.99"></div>
+        </div>
+        <div style="height:14px"></div>
+        <button id="save-settings-btn">💾 Save settings</button>
+        <div class="okmsg" id="settings-msg"></div>
+        <div class="err" id="settings-err"></div>
+        <p class="hint">Changes apply on next app restart.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script>
+/* ==========================================================================
+   Lafz Daily — Admin Panel logic
+   Data model:
+     words/{lang}/answers/{word}   (empty document, doc id = normalized word)
+     words/{lang}/guesses/{word}
+     config/ads      {bannerId, interstitialId, rewardedId,
+                      maxInterstitialsPerDay, adsEnabled}
+     config/settings {freeHintsPerDay, archiveDays, reminderEnabled,
+                      reminderHour, reminderMinute, proProductId, proPriceLabel}
+   ========================================================================== */
+(function () {
+'use strict';
+
+if (!firebaseConfig || firebaseConfig.apiKey === 'PASTE_HERE') {
+  document.body.innerHTML =
+    '<div class="wrap"><div class="card"><h1>⚠️ Setup needed</h1>' +
+    '<p>Paste your Firebase project values into <b>admin/firebase-config.js</b> first. See <b>admin/README.md</b>.</p></div></div>';
+  return;
+}
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+const $ = (id) => document.getElementById(id);
+const LANGS = { en: 'English', ur: 'Urdu', ar: 'Arabic', es: 'Spanish' };
+const LATIN = { en: true, es: true };
+const RTL = { ur: true, ar: true };
+let currentLang = 'en';
+let cache = { answers: [], guesses: [] };
+
+// ---------------------------------------------------------------------------
+// Text normalization — mirrors the app's lib/game/urdu_text.dart and
+// lib/game/arabic_text.dart so the admin and the app agree on what a
+// "5-letter word" is. Tashkeel/diacritics are stripped; look-alike
+// code points are canonicalized.
+// ---------------------------------------------------------------------------
+function stripCommon(s) {
+  // Remove tashkeel U+064B..U+0652, superscript alef U+0670,
+  // tatweel U+0640, hamza above/below U+0654/U+0655.
+  return s.replace(/[\u064B-\u0652\u0670\u0640\u0654\u0655]/g, '');
+}
+function normalizeUrdu(s) {
+  return stripCommon(s)
+    .replace(/\u064A/g, '\u06CC')  // ي -> ی (Farsi Yeh)
+    .replace(/\u0643/g, '\u06A9')  // ك -> ک (Keheh)
+    .replace(/\u0647/g, '\u06C1'); // ہ -> ہ (Heh Goal)
+}
+function normalizeArabic(s) {
+  return stripCommon(s)
+    .replace(/[\u0623\u0625\u0622]/g, '\u0627') // أ إ آ -> ا
+    .replace(/\u0629/g, '\u0647')              // ة -> ه
+    .replace(/\u0649/g, '\u064A')              // ى -> ي
+    .replace(/\u0624/g, '\u0648')              // ؤ -> و
+    .replace(/\u0626/g, '\u064A');             // ئ -> ي
+}
+function normalizeWord(lang, s) {
+  s = s.trim();
+  if (LATIN[lang]) return s.toLowerCase();
+  return lang === 'ur' ? normalizeUrdu(s) : normalizeArabic(s);
+}
+// Code-point length (surrogate-pair safe), like Dart's runes.length.
+function cpLen(s) { return Array.from(s).length; }
+
+// Returns {ok, word, error}. Every write path goes through this.
+function validateWord(lang, raw) {
+  const w = normalizeWord(lang, raw);
+  if (!w) return { ok: false, error: 'Type a word first.' };
+  if (w.includes('/')) return { ok: false, error: 'Word cannot contain "/".' };
+  if (LATIN[lang]) {
+    if (!/^[a-z]{5}$/.test(w))
+      return { ok: false, error: 'Must be exactly 5 letters a–z (no accents, no ñ).' };
+  } else {
+    if (cpLen(w) !== 5)
+      return { ok: false, error: 'Must be exactly 5 letters (after normalization). Got ' + cpLen(w) + '.' };
+    if (/[a-zA-Z0-9]/.test(w))
+      return { ok: false, error: 'Use only ' + LANGS[lang] + ' letters.' };
+  }
+  return { ok: true, word: w };
+}
+
+// ---------------------------------------------------------------------------
+// Auth
+// ---------------------------------------------------------------------------
+auth.onAuthStateChanged((user) => {
+  const loggedIn = !!user;
+  $('login-screen').classList.toggle('hidden', loggedIn);
+  $('app-screen').classList.toggle('hidden', !loggedIn);
+  if (loggedIn) {
+    $('user-line').textContent = 'Signed in as ' + user.email;
+    loadAll();
+  }
+});
+$('login-btn').addEventListener('click', async () => {
+  $('login-err').textContent = '';
+  try {
+    await auth.signInWithEmailAndPassword($('email').value.trim(), $('password').value);
+  } catch (e) {
+    $('login-err').textContent = 'Login failed: ' + friendlyErr(e);
+  }
+});
+$('password').addEventListener('keydown', (e) => { if (e.key === 'Enter') $('login-btn').click(); });
+$('logout-btn').addEventListener('click', () => auth.signOut());
+function friendlyErr(e) {
+  const c = (e && e.code) || '';
+  if (c === 'auth/invalid-credential' || c === 'auth/wrong-password') return 'wrong email or password';
+  if (c === 'auth/user-not-found') return 'no such user';
+  if (c === 'auth/network-request-failed') return 'network error — check connection';
+  return e.message || String(e);
+}
+
+// ---------------------------------------------------------------------------
+// Tabs
+// ---------------------------------------------------------------------------
+const panes = { words: 'pane-words', ads: 'pane-ads', settings: 'pane-settings' };
+Object.keys(panes).forEach((k) => {
+  $('tab-' + k).addEventListener('click', () => {
+    Object.keys(panes).forEach((j) => {
+      $('tab-' + j).classList.toggle('active', j === k);
+      $(panes[j]).classList.toggle('hidden', j !== k);
+    });
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Words tab
+// ---------------------------------------------------------------------------
+$('lang-select').addEventListener('change', (e) => {
+  currentLang = e.target.value;
+  $('search').value = '';
+  loadWords();
+});
+$('search').addEventListener('input', renderLists);
+
+function wordsCol(collection) {
+  return db.collection('words').doc(currentLang).collection(collection);
+}
+async function loadWords() {
+  try {
+    const [a, g] = await Promise.all([
+      wordsCol('answers').get(),
+      wordsCol('guesses').get(),
+    ]);
+    cache.answers = a.docs.map((d) => d.id).sort();
+    cache.guesses = g.docs.map((d) => d.id).sort();
+    renderLists();
+  } catch (e) {
+    $('add-answer-err').textContent = 'Could not load words: ' + friendlyErr(e);
+  }
+}
+function renderLists() {
+  const q = normalizeWord(currentLang, $('search').value);
+  const rtl = RTL[currentLang] ? ' rtl' : '';
+  const mk = (words, listId, countId, collection) => {
+    const box = $(listId);
+    box.innerHTML = '';
+    const shown = words.filter((w) => !q || w.includes(q));
+    $(countId).textContent = words.length + (q ? ' (' + shown.length + ' shown)' : '');
+    shown.forEach((w) => {
+      const row = document.createElement('div');
+      row.className = 'wordrow' + rtl;
+      const span = document.createElement('span');
+      span.textContent = w;
+      const del = document.createElement('button');
+      del.className = 'danger';
+      del.textContent = 'Delete';
+      del.addEventListener('click', () => deleteWord(collection, w));
+      row.appendChild(span);
+      row.appendChild(del);
+      box.appendChild(row);
+    });
+  };
+  mk(cache.answers, 'list-answers', 'count-answers', 'answers');
+  mk(cache.guesses, 'list-guesses', 'count-guesses', 'guesses');
+}
+async function addWord(collection, inputId, errId) {
+  const err = $(errId);
+  err.textContent = '';
+  const v = validateWord(currentLang, $(inputId).value);
+  if (!v.ok) { err.textContent = v.error; return; }
+  try {
+    const batch = db.batch();
+    // Every answer must also be a valid guess, or the app would reject it.
+    batch.set(wordsCol('guesses').doc(v.word), { addedAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
+    if (collection === 'answers') {
+      batch.set(wordsCol('answers').doc(v.word), { addedAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
+    }
+    await batch.commit();
+    $(inputId).value = '';
+    await loadWords();
+  } catch (e) {
+    err.textContent = 'Save failed: ' + friendlyErr(e) + ' (need the admin claim — see README.md)';
+  }
+}
+async function deleteWord(collection, word) {
+  if (!confirm('Delete "' + word + '" from ' + collection + '?')) return;
+  try {
+    const batch = db.batch();
+    batch.delete(wordsCol(collection).doc(word));
+    // If it was an answer, also drop it from guesses so lists stay consistent.
+    if (collection === 'answers') batch.delete(wordsCol('guesses').doc(word));
+    await batch.commit();
+    await loadWords();
+  } catch (e) {
+    alert('Delete failed: ' + friendlyErr(e));
+  }
+}
+$('add-answer-btn').addEventListener('click', () => addWord('answers', 'add-answer', 'add-answer-err'));
+$('add-guess-btn').addEventListener('click', () => addWord('guesses', 'add-guess', 'add-guess-err'));
+$('add-answer').addEventListener('keydown', (e) => { if (e.key === 'Enter') $('add-answer-btn').click(); });
+$('add-guess').addEventListener('keydown', (e) => { if (e.key === 'Enter') $('add-guess-btn').click(); });
+
+// ---------------------------------------------------------------------------
+// Ads tab
+// ---------------------------------------------------------------------------
+async function loadAds() {
+  $('ads-msg').textContent = ''; $('ads-err').textContent = '';
+  try {
+    const d = await db.collection('config').doc('ads').get();
+    const c = d.exists ? d.data() : {};
+    $('ad-banner').value = c.bannerId || '';
+    $('ad-inter').value = c.interstitialId || '';
+    $('ad-rewarded').value = c.rewardedId || '';
+    $('ad-max-inter').value = (c.maxInterstitialsPerDay == null ? 1 : c.maxInterstitialsPerDay);
+    $('ads-enabled').checked = c.adsEnabled !== false;
+  } catch (e) {
+    $('ads-err').textContent = 'Could not load: ' + friendlyErr(e);
+  }
+}
+function validAdId(v) {
+  v = v.trim();
+  if (!v) return true; // empty = keep test ads / unset
+  return /^ca-app-pub-\d+\/\d+$/.test(v);
+}
+$('save-ads-btn').addEventListener('click', async () => {
+  $('ads-msg').textContent = ''; $('ads-err').textContent = '';
+  const bannerId = $('ad-banner').value.trim();
+  const interstitialId = $('ad-inter').value.trim();
+  const rewardedId = $('ad-rewarded').value.trim();
+  const maxI = parseInt($('ad-max-inter').value, 10);
+  if (![bannerId, interstitialId, rewardedId].every(validAdId)) {
+    $('ads-err').textContent = 'Ad unit IDs must look like ca-app-pub-1234567890/1234567890 (or be left empty).';
+    return;
+  }
+  if (isNaN(maxI) || maxI < 0 || maxI > 10) {
+    $('ads-err').textContent = 'Max interstitials per day must be 0–10.';
+    return;
+  }
+  try {
+    await db.collection('config').doc('ads').set({
+      bannerId, interstitialId, rewardedId,
+      maxInterstitialsPerDay: maxI,
+      adsEnabled: $('ads-enabled').checked,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+    }, { merge: true });
+    $('ads-msg').textContent = '✓ Saved. Takes effect on next app restart.';
+  } catch (e) {
+    $('ads-err').textContent = 'Save failed: ' + friendlyErr(e) + ' (need the admin claim — see README.md)';
+  }
+});
+
+// ---------------------------------------------------------------------------
+// Settings tab
+// ---------------------------------------------------------------------------
+async function loadSettings() {
+  $('settings-msg').textContent = ''; $('settings-err').textContent = '';
+  try {
+    const d = await db.collection('config').doc('settings').get();
+    const c = d.exists ? d.data() : {};
+    $('set-hints').value = (c.freeHintsPerDay == null ? 1 : c.freeHintsPerDay);
+    $('set-archive').value = (c.archiveDays == null ? 60 : c.archiveDays);
+    $('set-reminder').checked = c.reminderEnabled !== false;
+    const h = c.reminderHour == null ? 9 : c.reminderHour;
+    const m = c.reminderMinute == null ? 0 : c.reminderMinute;
+    $('set-reminder-time').value = String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0');
+    $('set-pro-id').value = c.proProductId || 'lafz_daily_pro';
+    $('set-pro-price').value = c.proPriceLabel || '$4.99';
+  } catch (e) {
+    $('settings-err').textContent = 'Could not load: ' + friendlyErr(e);
+  }
+}
+$('save-settings-btn').addEventListener('click', async () => {
+  $('settings-msg').textContent = ''; $('settings-err').textContent = '';
+  const hints = parseInt($('set-hints').value, 10);
+  const archive = parseInt($('set-archive').value, 10);
+  const proId = $('set-pro-id').value.trim();
+  const proPrice = $('set-pro-price').value.trim();
+  const t = $('set-reminder-time').value.split(':');
+  if (isNaN(hints) || hints < 0 || hints > 10) { $('settings-err').textContent = 'Free hints must be 0–10.'; return; }
+  if (isNaN(archive) || archive < 1 || archive > 365) { $('settings-err').textContent = 'Archive days must be 1–365.'; return; }
+  if (!/^[a-z][a-z0-9_.]*$/.test(proId)) { $('settings-err').textContent = 'Pro product ID: lowercase letters, numbers, dots/underscores.'; return; }
+  if (proPrice.length > 20) { $('settings-err').textContent = 'Price label too long.'; return; }
+  try {
+    await db.collection('config').doc('settings').set({
+      freeHintsPerDay: hints,
+      archiveDays: archive,
+      reminderEnabled: $('set-reminder').checked,
+      reminderHour: parseInt(t[0], 10) || 0,
+      reminderMinute: parseInt(t[1], 10) || 0,
+      proProductId: proId,
+      proPriceLabel: proPrice,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+    }, { merge: true });
+    $('settings-msg').textContent = '✓ Saved. Takes effect on next app restart.';
+  } catch (e) {
+    $('settings-err').textContent = 'Save failed: ' + friendlyErr(e) + ' (need the admin claim — see README.md)';
+  }
+});
+
+async function loadAll() {
+  await Promise.all([loadWords(), loadAds(), loadSettings()]);
+}
+
+})();
+</script>
+</body>
+</html>

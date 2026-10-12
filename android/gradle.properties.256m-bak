@@ -1,0 +1,16 @@
+# Low-memory environment: keep every JVM small.
+org.gradle.jvmargs=-Xmx256m -XX:MaxMetaspaceSize=128m
+kotlin.daemon.jvmargs=-Xmx256m
+org.gradle.workers.max=1
+android.useAndroidX=true
+# This newDsl flag was added by the Flutter template
+android.newDsl=false
+# This builtInKotlin flag was added by the Flutter template
+android.builtInKotlin=false
+# Third-party plugins (e.g. flutter_timezone) set Kotlin jvmTarget 1.8 while
+# Java compiles at 11; newer KGP fails hard on this mismatch. Downgrade to a
+# warning so the debug build proceeds (release builds should revisit).
+# NOTE: KGP 2.x reads the dotted key (kotlin.jvm.target.validation.mode),
+# not the old camelCase kotlin.jvmTargetValidationMode.
+kotlin.jvm.target.validation.mode=WARNING
+org.gradle.daemon=false

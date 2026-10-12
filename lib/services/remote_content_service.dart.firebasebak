@@ -1,0 +1,126 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
+import '../config/ads_config.dart';
+import '../config/app_config.dart';
+import '../game/lang_utils.dart';
+import '../l10n/strings.dart';
+
+/// Remote content from the Firebase admin panel (see admin/README.md).
+///
+/// On startup [init] tries `Firebase.initializeApp()` and fetches
+/// `config/ads`, `config/settings` and the per-language word lists.
+/// EVERYTHING here is best-effort:
+/// - No google-services.json / no network / empty collections →
+///   the app silently keeps its bundled lists and hardcoded defaults.
+/// - Remote word lists are used only when the fetched collection is
+///   non-empty (so a half-configured backend can never wipe the game).
+///
+/// Effective-value getters below return the remote value when present,
+/// otherwise the bundled default — call sites need no null checks.
+class RemoteContentService {
+  RemoteContentService._();
+  static final RemoteContentService instance = RemoteContentService._();
+
+  bool _ready = false;
+  bool get ready => _ready;
+
+  final Map<String, dynamic> _ads = {};
+  final Map<String, dynamic> _settings = {};
+  final Map<AppLang, List<String>> _remoteAnswers = {};
+  final Map<AppLang, List<String>> _remoteGuesses = {};
+
+  /// Fire-and-forget safe: never throws.
+  Future<void> init() async {
+    try {
+      await Firebase.initializeApp();
+    } catch (e) {
+      // No google-services.json (e.g. debug build) or no Firebase project
+      // linked yet — bundled content stays active. This is expected.
+      debugPrint('RemoteContent: Firebase not configured, using bundled content.');
+      return;
+    }
+    try {
+      await _fetch().timeout(const Duration(seconds: 10));
+      _ready = true;
+      debugPrint('RemoteContent: remote config loaded.');
+    } catch (e) {
+      debugPrint('RemoteContent: fetch failed, using bundled content: $e');
+    }
+  }
+
+  Future<void> _fetch() async {
+    final db = FirebaseFirestore.instance;
+    final adsDoc = await db.collection('config').doc('ads').get();
+    if (adsDoc.exists) _ads.addAll(adsDoc.data() ?? {});
+    final setDoc = await db.collection('config').doc('settings').get();
+    if (setDoc.exists) _settings.addAll(setDoc.data() ?? {});
+
+    for (final lang in AppLang.values) {
+      final answers = await _fetchWords(db, lang, 'answers');
+      final guesses = await _fetchWords(db, lang, 'guesses');
+      // Only override when the cloud lists are non-empty.
+      if (answers.isNotEmpty) _remoteAnswers[lang] = answers;
+      if (guesses.isNotEmpty) _remoteGuesses[lang] = guesses;
+    }
+  }
+
+  Future<List<String>> _fetchWords(
+      FirebaseFirestore db, AppLang lang, String collection) async {
+    final snap =
+        await db.collection('words').doc(lang.name).collection(collection).get();
+    final words = <String>[];
+    for (final doc in snap.docs) {
+      final w = lang.normalizeWord(doc.id);
+      // Defensive: ignore malformed entries; the admin panel validates,
+      // but a hand-written doc could slip through.
+      if (w.runes.length == AppConfig.wordLength) words.add(w);
+    }
+    return words;
+  }
+
+  // ------------------------------------------------------- word lists --
+  /// Remote answer list for [lang], or null to keep the bundled list.
+  List<String>? remoteAnswers(AppLang lang) => _remoteAnswers[lang];
+
+  /// Remote guess list for [lang], or null to keep the bundled list.
+  List<String>? remoteGuesses(AppLang lang) => _remoteGuesses[lang];
+
+  // ------------------------------------------------------------- ads --
+  /// Explicit kill-switch from the admin panel (null = not configured).
+  bool? get adsEnabled {
+    final v = _ads['adsEnabled'];
+    return v is bool ? v : null;
+  }
+
+  String get effectiveBannerId {
+    final v = _ads['bannerId'];
+    return (v is String && v.isNotEmpty) ? v : AdsConfig.bannerId;
+  }
+
+  String get effectiveInterstitialId {
+    final v = _ads['interstitialId'];
+    return (v is String && v.isNotEmpty) ? v : AdsConfig.interstitialId;
+  }
+
+  String get effectiveRewardedId {
+    final v = _ads['rewardedId'];
+    return (v is String && v.isNotEmpty) ? v : AdsConfig.rewardedId;
+  }
+
+  int get effectiveMaxInterstitialsPerDay {
+    final v = _ads['maxInterstitialsPerDay'];
+    return (v is int && v >= 0) ? v : AppConfig.maxInterstitialsPerDay;
+  }
+
+  // -------------------------------------------------------- settings --
+  int get effectiveFreeHintsPerDay {
+    final v = _settings['freeHintsPerDay'];
+    return (v is int && v >= 0) ? v : AppConfig.freeHintsPerDay;
+  }
+
+  int get effectiveArchiveDays {
+    final v = _settings['archiveDays'];
+    return (v is int && v > 0) ? v : AppConfig.archiveDays;
+  }
+}
