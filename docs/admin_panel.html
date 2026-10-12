@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lafz Daily — Admin Panel</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f7fa; color: #1a1a2e; }
+.login-screen { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #1B5E20, #0D3B1E); }
+.login-box { background: white; padding: 40px; border-radius: 16px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); width: 90%; max-width: 400px; }
+.login-box h1 { color: #1B5E20; margin-bottom: 8px; font-size: 28px; }
+.login-box p { color: #666; margin-bottom: 24px; }
+.login-box input { width: 100%; padding: 14px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 16px; margin-bottom: 16px; }
+.login-box input:focus { outline: none; border-color: #1B5E20; }
+.login-box button { width: 100%; padding: 14px; background: #1B5E20; color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: 700; cursor: pointer; }
+.login-box button:hover { background: #2E7D32; }
+.error { color: #d32f2f; margin-top: 12px; font-size: 14px; display: none; }
+.dashboard { display: none; }
+.header { background: linear-gradient(135deg, #1B5E20, #2E7D32); color: white; padding: 20px 30px; display: flex; justify-content: space-between; align-items: center; }
+.header h1 { font-size: 24px; }
+.header button { background: rgba(255,255,255,0.2); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; }
+.tabs { display: flex; background: white; border-bottom: 2px solid #e0e0e0; overflow-x: auto; }
+.tab { padding: 16px 24px; cursor: pointer; border: none; background: none; font-size: 15px; font-weight: 600; color: #666; white-space: nowrap; }
+.tab.active { color: #1B5E20; border-bottom: 3px solid #1B5E20; }
+.content { padding: 24px 30px; max-width: 1200px; margin: 0 auto; }
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
+.stat-card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+.stat-card .icon { font-size: 32px; margin-bottom: 8px; }
+.stat-card .value { font-size: 28px; font-weight: 800; color: #1B5E20; }
+.stat-card .label { color: #666; font-size: 14px; }
+table { width: 100%; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.08); border-collapse: collapse; }
+th, td { padding: 14px 16px; text-align: left; border-bottom: 1px solid #f0f0f0; }
+th { background: #f8f9fa; font-weight: 700; color: #555; font-size: 13px; text-transform: uppercase; }
+tr:hover { background: #f8f9fa; }
+.btn { padding: 8px 16px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 13px; margin-right: 8px; }
+.btn-approve { background: #4caf50; color: white; }
+.btn-reject { background: #f44336; color: white; }
+.btn-paid { background: #2196f3; color: white; }
+.badge { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; }
+.badge-pending { background: #fff3e0; color: #e65100; }
+.badge-approved { background: #e8f5e9; color: #2e7d32; }
+.badge-rejected { background: #ffebee; color: #c62828; }
+.badge-paid { background: #e3f2fd; color: #1565c0; }
+.form-group { background: white; padding: 20px; border-radius: 12px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+.form-group label { display: block; font-weight: 700; margin-bottom: 8px; color: #333; }
+.form-group input, .form-group select { width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 15px; }
+.form-group input:focus { outline: none; border-color: #1B5E20; }
+.form-group .hint { font-size: 13px; color: #888; margin-top: 6px; }
+.save-btn { background: #1B5E20; color: white; padding: 14px 32px; border: none; border-radius: 10px; font-size: 16px; font-weight: 700; cursor: pointer; margin-top: 16px; }
+.save-btn:hover { background: #2E7D32; }
+.loading { text-align: center; padding: 40px; color: #888; }
+</style>
+</head>
+<body>
+
+<!-- Login -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-box">
+    <h1>🎮 Lafz Daily</h1>
+    <p>Admin Panel — Owner Only</p>
+    <input type="password" id="adminPass" placeholder="Admin password" onkeypress="if(event.key==='Enter')login()">
+    <button onclick="login()">Login</button>
+    <div class="error" id="loginError">Wrong password</div>
+  </div>
+</div>
+
+<!-- Dashboard -->
+<div class="dashboard" id="dashboard">
+  <div class="header">
+    <h1>🎮 Lafz Daily Admin</h1>
+    <button onclick="logout()">Logout</button>
+  </div>
+  <div class="tabs">
+    <button class="tab active" onclick="showTab('overview')">📊 Overview</button>
+    <button class="tab" onclick="showTab('players')">👥 Players</button>
+    <button class="tab" onclick="showTab('premium')">⭐ Premium Requests</button>
+    <button class="tab" onclick="showTab('withdrawals')">💰 Withdrawals</button>
+    <button class="tab" onclick="showTab('ads')">📢 AdMob Ads</button>
+    <button class="tab" onclick="showTab('settings')">⚙️ App Settings</button>
+  </div>
+  <div class="content">
+    <div id="tab-overview" class="tab-content active">
+      <div class="stats-grid" id="statsGrid"><div class="loading">Loading...</div></div>
+    </div>
+    <div id="tab-players" class="tab-content">
+      <div id="playersTable"><div class="loading">Loading...</div></div>
+    </div>
+    <div id="tab-premium" class="tab-content">
+      <div id="premiumTable"><div class="loading">Loading...</div></div>
+    </div>
+    <div id="tab-withdrawals" class="tab-content">
+      <div id="withdrawalsTable"><div class="loading">Loading...</div></div>
+    </div>
+    <div id="tab-ads" class="tab-content">
+      <h2 style="margin-bottom:16px">📢 AdMob Configuration</h2>
+      <p style="color:#666;margin-bottom:20px">Ye settings app mein foran apply hongi (app restart par). Ads ki IDs yahan se change kar sakte hain.</p>
+      <div id="adsForm"><div class="loading">Loading...</div></div>
+      <button class="save-btn" onclick="saveAds()">💾 Save Ad Settings</button>
+    </div>
+    <div id="tab-settings" class="tab-content">
+      <h2 style="margin-bottom:16px">⚙️ App Settings</h2>
+      <div id="settingsForm"><div class="loading">Loading...</div></div>
+      <button class="save-btn" onclick="saveSettings()">💾 Save Settings</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// Supabase config
+const SUPABASE_URL = 'https://qetgxtjxsgmengtlqulj.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFldGd4dGp4c2dtZW5ndGxxdWxqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MDk5MTIsImV4cCI6MjEwNzM4NTkxMn0.YII5OUEm7xo9tfZy9Zz1Dz5w1OfU1QRSCR2p-ZYWf6M';
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// Simple password (change this!)
+const ADMIN_PASSWORD = 'lafzadmin2026';
+
+function login() {
+  const pass = document.getElementById('adminPass').value;
+  if (pass === ADMIN_PASSWORD) {
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('dashboard').style.display = 'block';
+    loadAll();
+  } else {
+    document.getElementById('loginError').style.display = 'block';
+  }
+}
+function logout() { location.reload(); }
+function showTab(name) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('tab-' + name).classList.add('active');
+}
+
+async function loadAll() {
+  loadStats(); loadPlayers(); loadPremium(); loadWithdrawals(); loadAds(); loadSettings();
+}
+
+async function loadStats() {
+  try {
+    const { count: players } = await supabase.from('players').select('*', { count: 'exact', head: true });
+    const { count: premiumPending } = await supabase.from('premium_applications').select('*', { count: 'exact', head: true }).eq('status', 'pending');
+    const { count: withdrawalPending } = await supabase.from('withdrawal_requests').select('*', { count: 'exact', head: true }).eq('status', 'pending');
+    const { data: balances } = await supabase.from('balances').select('balance_cents');
+    const totalOwed = (balances || []).reduce((s, b) => s + (b.balance_cents || 0), 0) / 100;
+    
+    document.getElementById('statsGrid').innerHTML = `
+      <div class="stat-card"><div class="icon">👥</div><div class="value">${players || 0}</div><div class="label">Total Players</div></div>
+      <div class="stat-card"><div class="icon">⭐</div><div class="value">${premiumPending || 0}</div><div class="label">Pending Premium</div></div>
+      <div class="stat-card"><div class="icon">💰</div><div class="value">${withdrawalPending || 0}</div><div class="label">Pending Withdrawals</div></div>
+      <div class="stat-card"><div class="icon">💵</div><div class="value">$${totalOwed.toFixed(2)}</div><div class="label">Total Owed</div></div>
+    `;
+  } catch(e) { document.getElementById('statsGrid').innerHTML = '<div class="loading">Error: ' + e.message + '</div>'; }
+}
+
+async function loadPlayers() {
+  try {
+    const { data, error } = await supabase.from('players').select('*').order('created_at', { ascending: false }).limit(100);
+    if (error) throw error;
+    let html = '<table><tr><th>Name</th><th>Device ID</th><th>Joined</th><th>Balance</th></tr>';
+    for (const p of (data || [])) {
+      const { data: bal } = await supabase.from('balances').select('balance_cents').eq('player_id', p.id).single();
+      const balance = bal ? (bal.balance_cents / 100).toFixed(2) : '0.00';
+      html += `<tr><td><strong>${p.name || 'Unknown'}</strong></td><td style="font-size:12px;color:#888">${(p.device_id || '').substring(0, 12)}...</td><td>${new Date(p.created_at).toLocaleDateString()}</td><td><strong>$${balance}</strong></td></tr>`;
+    }
+    html += '</table>';
+    document.getElementById('playersTable').innerHTML = html;
+  } catch(e) { document.getElementById('playersTable').innerHTML = '<div class="loading">Error: ' + e.message + '</div>'; }
+}
+
+async function loadPremium() {
+  try {
+    const { data, error } = await supabase.from('premium_applications').select('*').order('created_at', { ascending: false });
+    if (error) throw error;
+    let html = '<table><tr><th>Player</th><th>Package</th><th>Payment Ref</th><th>Date</th><th>Status</th><th>Action</th></tr>';
+    for (const r of (data || [])) {
+      const badge = r.status === 'pending' ? 'badge-pending' : r.status === 'approved' ? 'badge-approved' : 'badge-rejected';
+      html += `<tr><td>${r.player_id?.substring(0, 8) || 'N/A'}</td><td><strong>${r.package || 'N/A'}</strong></td><td style="font-size:12px">${r.payment_reference || 'N/A'}</td><td>${new Date(r.created_at).toLocaleDateString()}</td><td><span class="badge ${badge}">${r.status}</span></td><td>`;
+      if (r.status === 'pending') {
+        html += `<button class="btn btn-approve" onclick="approvePremium('${r.id}', '${r.player_id}')">Approve</button><button class="btn btn-reject" onclick="rejectPremium('${r.id}')">Reject</button>`;
+      }
+      html += '</td></tr>';
+    }
+    html += '</table>';
+    document.getElementById('premiumTable').innerHTML = html || '<div class="loading">No requests</div>';
+  } catch(e) { document.getElementById('premiumTable').innerHTML = '<div class="loading">Error: ' + e.message + '</div>'; }
+}
+
+async function approvePremium(id, playerId) {
+  if (!confirm('Approve this premium request?')) return;
+  await supabase.from('premium_applications').update({ status: 'approved' }).eq('id', id);
+  // Mark player as premium
+  await supabase.from('players').update({ is_premium: true }).eq('id', playerId);
+  alert('Approved!'); loadPremium(); loadStats();
+}
+async function rejectPremium(id) {
+  if (!confirm('Reject this request?')) return;
+  await supabase.from('premium_applications').update({ status: 'rejected' }).eq('id', id);
+  alert('Rejected'); loadPremium(); loadStats();
+}
+
+async function loadWithdrawals() {
+  try {
+    const { data, error } = await supabase.from('withdrawal_requests').select('*').order('created_at', { ascending: false });
+    if (error) throw error;
+    let html = '<table><tr><th>Player</th><th>Amount</th><th>Method</th><th>Details</th><th>Date</th><th>Status</th><th>Action</th></tr>';
+    for (const w of (data || [])) {
+      const badge = w.status === 'pending' ? 'badge-pending' : w.status === 'paid' ? 'badge-paid' : 'badge-rejected';
+      html += `<tr><td>${w.player_id?.substring(0, 8) || 'N/A'}</td><td><strong>$${(w.amount_cents / 100).toFixed(2)}</strong></td><td>${w.method || 'N/A'}</td><td style="font-size:12px">${w.details || 'N/A'}</td><td>${new Date(w.created_at).toLocaleDateString()}</td><td><span class="badge ${badge}">${w.status}</span></td><td>`;
+      if (w.status === 'pending') {
+        html += `<button class="btn btn-paid" onclick="markPaid('${w.id}')">Mark Paid</button>`;
+      }
+      html += '</td></tr>';
+    }
+    html += '</table>';
+    document.getElementById('withdrawalsTable').innerHTML = html || '<div class="loading">No requests</div>';
+  } catch(e) { document.getElementById('withdrawalsTable').innerHTML = '<div class="loading">Error: ' + e.message + '</div>'; }
+}
+
+async function markPaid(id) {
+  if (!confirm('Mark as paid? Make sure you sent the money!')) return;
+  await supabase.from('withdrawal_requests').update({ status: 'paid' }).eq('id', id);
+  alert('Marked as paid!'); loadWithdrawals(); loadStats();
+}
+
+async function loadAds() {
+  try {
+    const { data } = await supabase.from('app_settings').select('*').like('key', 'admob_%');
+    const settings = {};
+    (data || []).forEach(s => settings[s.key] = s.value);
+    
+    document.getElementById('adsForm').innerHTML = `
+      <div class="form-group"><label>📢 AdMob Enabled</label>
+        <select id="ad_enabled"><option value="true" ${settings.admob_enabled === 'true' ? 'selected' : ''}>Yes — Show Ads</option><option value="false" ${settings.admob_enabled !== 'true' ? 'selected' : ''}>No — Hide All Ads</option></select>
+        <div class="hint">Master switch — turn off all ads instantly</div></div>
+      <div class="form-group"><label>Banner Ad Unit ID</label>
+        <input id="ad_banner" value="${settings.admob_banner_id || ''}" placeholder="ca-app-pub-xxxxx/yyyyy">
+        <div class="hint">Shown at bottom of game screen</div></div>
+      <div class="form-group"><label>Interstitial Ad Unit ID</label>
+        <input id="ad_interstitial" value="${settings.admob_interstitial_id || ''}" placeholder="ca-app-pub-xxxxx/yyyyy">
+        <div class="hint">Full-screen ad after puzzle completion</div></div>
+      <div class="form-group"><label>Rewarded Ad Unit ID</label>
+        <input id="ad_rewarded" value="${settings.admob_rewarded_id || ''}" placeholder="ca-app-pub-xxxxx/yyyyy">
+        <div class="hint">Watch ad for extra hint</div></div>
+      <div class="form-group"><label>Interstitial Frequency (games)</label>
+        <input id="ad_freq" type="number" value="${settings.admob_interstitial_freq || '3'}" min="1" max="10">
+        <div class="hint">Show interstitial every X completed puzzles</div></div>
+    `;
+  } catch(e) { document.getElementById('adsForm').innerHTML = '<div class="loading">Error: ' + e.message + '</div>'; }
+}
+
+async function saveAds() {
+  const updates = [
+    { key: 'admob_enabled', value: document.getElementById('ad_enabled').value },
+    { key: 'admob_banner_id', value: document.getElementById('ad_banner').value },
+    { key: 'admob_interstitial_id', value: document.getElementById('ad_interstitial').value },
+    { key: 'admob_rewarded_id', value: document.getElementById('ad_rewarded').value },
+    { key: 'admob_interstitial_freq', value: document.getElementById('ad_freq').value },
+  ];
+  for (const u of updates) {
+    await supabase.from('app_settings').upsert(u, { onConflict: 'key' });
+  }
+  alert('✅ Ad settings saved! App will use these on next launch.');
+}
+
+async function loadSettings() {
+  try {
+    const { data } = await supabase.from('app_settings').select('*').not('key', 'like', 'admob_%');
+    const settings = {};
+    (data || []).forEach(s => settings[s.key] = s.value);
+    
+    document.getElementById('settingsForm').innerHTML = `
+      <div class="form-group"><label>💰 Reward Per Win (USD)</label>
+        <input id="set_reward" type="number" step="0.01" value="${settings.reward_per_win || '0.05'}">
+        <div class="hint">Amount credited per puzzle win</div></div>
+      <div class="form-group"><label>🏆 Max Cash Wins Per Day</label>
+        <input id="set_maxwins" type="number" value="${settings.max_cash_wins_per_day || '5'}">
+        <div class="hint">Global daily cap for cash rewards</div></div>
+      <div class="form-group"><label>💵 Min Withdrawal (USD)</label>
+        <input id="set_minwithdraw" type="number" step="0.01" value="${settings.min_withdrawal || '5.00'}">
+        <div class="hint">Minimum balance to request payout</div></div>
+    `;
+  } catch(e) { document.getElementById('settingsForm').innerHTML = '<div class="loading">Error: ' + e.message + '</div>'; }
+}
+
+async function saveSettings() {
+  const updates = [
+    { key: 'reward_per_win', value: document.getElementById('set_reward').value },
+    { key: 'max_cash_wins_per_day', value: document.getElementById('set_maxwins').value },
+    { key: 'min_withdrawal', value: document.getElementById('set_minwithdraw').value },
+  ];
+  for (const u of updates) {
+    await supabase.from('app_settings').upsert(u, { onConflict: 'key' });
+  }
+  alert('✅ Settings saved!');
+}
+</script>
+</body>
+</html>
