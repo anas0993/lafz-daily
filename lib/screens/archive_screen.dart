@@ -2,11 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../l10n/strings.dart';
 import '../main.dart';
-import '../services/billing_service.dart';
 import '../services/remote_content_service.dart';
 import '../services/storage_service.dart';
 import 'game_screen.dart';
-import 'pro_screen.dart';
 import '../game/puzzle.dart';
 
 /// Archive of past daily puzzles (Pro feature).
@@ -22,39 +20,6 @@ class _ArchiveScreenState extends State<ArchiveScreen> {
   Widget build(BuildContext context) {
     final appState = context.watch<AppState>();
     final s = appState.s;
-    final isPro = BillingService.instance.isPro.value;
-
-    if (!isPro) {
-      return Scaffold(
-        appBar: AppBar(title: Text(s.get('archive'))),
-        body: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(28),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(Icons.lock_rounded, size: 64),
-                const SizedBox(height: 16),
-                Text(s.get('proOnly'),
-                    style: const TextStyle(
-                        fontSize: 20, fontWeight: FontWeight.w700)),
-                const SizedBox(height: 8),
-                Text(s.get('proF2'), textAlign: TextAlign.center),
-                const SizedBox(height: 20),
-                FilledButton(
-                  onPressed: () => Navigator.of(context).push(
-                    MaterialPageRoute(
-                        builder: (_) => const ProScreen()),
-                  ),
-                  child: Text(s.get('proTitle')),
-                ),
-              ],
-            ),
-          ),
-        ),
-      );
-    }
-
     final today = DateTime.now();
     return Scaffold(
       appBar: AppBar(title: Text(s.get('archive'))),

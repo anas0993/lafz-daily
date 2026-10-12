@@ -12,6 +12,7 @@ import 'game_screen.dart';
 import 'how_to_play_screen.dart';
 import 'settings_screen.dart';
 import 'splash_screen.dart';
+import 'premium_screen.dart';
 import 'stats_screen.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -141,6 +142,26 @@ class HomeScreen extends StatelessWidget {
                     onPressed: () => Navigator.of(context).push(
                       MaterialPageRoute(
                           builder: (_) => const GameScreen.practice()),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                // Premium button
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton.icon(
+                    icon: const Icon(Icons.workspace_premium_rounded),
+                    label: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      child: Text(s.get('premiumTitle'),
+                          style: const TextStyle(fontSize: 17)),
+                    ),
+                    style: FilledButton.styleFrom(
+                      backgroundColor: Colors.amber.shade700,
+                    ),
+                    onPressed: () => Navigator.of(context).push(
+                      MaterialPageRoute(
+                          builder: (_) => const PremiumScreen()),
                     ),
                   ),
                 ),
