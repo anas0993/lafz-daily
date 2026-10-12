@@ -317,43 +317,6 @@ class S {
       'التدريب للمتعة فقط — الألغاز اليومية هي التي تربح.',
       'La práctica es solo diversión — solo los puzzles diarios ganan.'
     ],
-  };
-
-  /// Index of each language in the [_t] value lists.
-  static const Map<AppLang, int> _index = {
-    AppLang.en: 0,
-    AppLang.ur: 1,
-    AppLang.ar: 2,
-    AppLang.es: 3,
-  };
-
-  String get(String key) => _t[key]![_index[lang]!];
-
-  /// "Lafz Daily #123 4/6" / per-language branding.
-  String puzzleTag(int number) => switch (lang) {
-        AppLang.en => 'Lafz Daily #$number',
-        AppLang.ur => 'لفظ ڈیلی #$number',
-        AppLang.ar => 'لفظ يومي #$number',
-        AppLang.es => 'Lafz Diario #$number',
-      };
-
-  /// "Puzzle 3 of 5" for the daily slot header.
-  String puzzleOf(int i, int total) => switch (lang) {
-        AppLang.en => 'Puzzle $i of $total',
-        AppLang.ur => 'پہیلی $i از $total',
-        AppLang.ar => 'اللغز $i من $total',
-        AppLang.es => 'Puzzle $i de $total',
-      };
-
-  /// Feedback toast after a wrong (but valid) guess.
-  String guessFeedback(int correct, int present) => switch (lang) {
-        AppLang.en => '$correct exact • $present misplaced — try again!',
-        AppLang.ur =>
-          '$correct بالکل صحیح • $present غلط جگہ — دوبارہ کوشش کریں!',
-        AppLang.ar =>
-          '$correct في مكانها • $present في مكان خاطئ — حاول مجددًا!',
-        AppLang.es =>
-          '$correct exactas • $present mal ubicadas — ¡otra vez!',
         'enterNameTitle': [
       'What should we call you?',
       'آپ کو کیا کہیں؟',
@@ -511,10 +474,10 @@ class S {
       'Solicitar retiro'
     ],
     'withdrawLocked': [
-      'Reach $5.00 to unlock withdrawals. Keep playing!',
-      'رقم نکلوانے کے لیے $5.00 تک پہنچیں۔ کھیلتے رہیں!',
-      'اصِل إلى $5.00 لفتح السحوبات. واصل اللعب!',
-      '¡Llega a $5.00 para desbloquear retiros. Sigue jugando!'
+      'Reach \$5.00 to unlock withdrawals. Keep playing!',
+      'رقم نکلوانے کے لیے \$5.00 تک پہنچیں۔ کھیلتے رہیں!',
+      'اصِل إلى \$5.00 لفتح السحوبات. واصل اللعب!',
+      '¡Llega a \$5.00 para desbloquear retiros. Sigue jugando!'
     ],
     'withdrawSubmitted': [
       'Request Submitted!',
@@ -529,4 +492,42 @@ class S {
       'Procesaremos tu pago pronto.'
     ],
   };
+
+
+  /// Index of each language in the [_t] value lists.
+  static const Map<AppLang, int> _index = {
+    AppLang.en: 0,
+    AppLang.ur: 1,
+    AppLang.ar: 2,
+    AppLang.es: 3,
+  };
+
+  String get(String key) => _t[key]![_index[lang]!];
+
+  /// "Lafz Daily #123 4/6" / per-language branding.
+  String puzzleTag(int number) => switch (lang) {
+        AppLang.en => 'Lafz Daily #$number',
+        AppLang.ur => 'لفظ ڈیلی #$number',
+        AppLang.ar => 'لفظ يومي #$number',
+        AppLang.es => 'Lafz Diario #$number',
+      };
+
+  /// "Puzzle 3 of 5" for the daily slot header.
+  String puzzleOf(int i, int total) => switch (lang) {
+        AppLang.en => 'Puzzle $i of $total',
+        AppLang.ur => 'پہیلی $i از $total',
+        AppLang.ar => 'اللغز $i من $total',
+        AppLang.es => 'Puzzle $i de $total',
+      };
+
+  /// Feedback toast after a wrong (but valid) guess.
+  String guessFeedback(int correct, int present) => switch (lang) {
+        AppLang.en => '$correct exact • $present misplaced — try again!',
+        AppLang.ur =>
+          '$correct بالکل صحیح • $present غلط جگہ — دوبارہ کوشش کریں!',
+        AppLang.ar =>
+          '$correct في مكانها • $present في مكان خاطئ — حاول مجددًا!',
+        AppLang.es =>
+          '$correct exactas • $present mal ubicadas — ¡otra vez!',
+      };
 }
