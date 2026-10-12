@@ -48,6 +48,10 @@ class WordRepository {
   String dailyAnswer([DateTime? date]) =>
       Puzzle.dailyAnswer(answers, date ?? DateTime.now());
 
+  /// The daily answer for [date] and [slot] (0-4). Defaults to today.
+  String dailyAnswerForSlot(int slot, [DateTime? date]) =>
+      Puzzle.dailyAnswerForSlot(answers, date ?? DateTime.now(), slot);
+
   /// A random answer for practice mode.
   String randomAnswer([Random? rng]) =>
       answers[(rng ?? Random()).nextInt(answers.length)];
