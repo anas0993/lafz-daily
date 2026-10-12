@@ -15,8 +15,19 @@ class Puzzle {
   /// Deterministically picks the answer for [date] from [answers].
   /// Uses a splitmix64-style hash so consecutive days don't get adjacent
   /// words from the list.
-  static String dailyAnswer(List<String> answers, DateTime date) {
-    var z = dayNumber(date) * 0x9E3779B97F4A7C15 + 0xBF58476D1CE4E5B9;
+  static String dailyAnswer(List<String> answers, DateTime date) =>
+      dailyAnswerForSlot(answers, date, 0);
+
+  /// Number of puzzles per day.
+  static const int puzzlesPerDay = 5;
+
+  /// Deterministically picks the answer for [date] and [slot] (0-4).
+  /// Each slot gets a different word, so every player gets the same 5
+  /// words each day with no server involved.
+  static String dailyAnswerForSlot(
+      List<String> answers, DateTime date, int slot) {
+    var z = (dayNumber(date) * puzzlesPerDay + slot) * 0x9E3779B97F4A7C15 +
+        0xBF58476D1CE4E5B9;
     z = (z ^ (z >> 30)) * 0xBF58476D1CE4E5B9;
     z = (z ^ (z >> 27)) * 0x94D049BB133111EB;
     z = z ^ (z >> 31);
