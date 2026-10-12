@@ -102,6 +102,26 @@ class _GameViewState extends State<_GameView> {
       body: SafeArea(
         child: Column(
           children: [
+            SizedBox(
+              height: 44,
+              child: Center(
+                child: game.toast == null
+                    ? const SizedBox.shrink()
+                    : Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 20, vertical: 9),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context)
+                              .colorScheme
+                              .surfaceContainerHighest,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Text(game.toast!,
+                            style: const TextStyle(
+                                fontWeight: FontWeight.w700, fontSize: 17)),
+                      ),
+              ),
+            ),
             Expanded(
               child: SingleChildScrollView(
                 child: Padding(
@@ -113,26 +133,6 @@ class _GameViewState extends State<_GameView> {
                     lang: appState.lang,
                   ),
                 ),
-              ),
-            ),
-            SizedBox(
-              height: 28,
-              child: Center(
-                child: game.toast == null
-                    ? const SizedBox.shrink()
-                    : Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 14, vertical: 5),
-                        decoration: BoxDecoration(
-                          color: Theme.of(context)
-                              .colorScheme
-                              .surfaceContainerHighest,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Text(game.toast!,
-                            style:
-                                const TextStyle(fontWeight: FontWeight.w600)),
-                      ),
               ),
             ),
             Padding(
