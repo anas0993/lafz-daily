@@ -354,5 +354,179 @@ class S {
           '$correct في مكانها • $present في مكان خاطئ — حاول مجددًا!',
         AppLang.es =>
           '$correct exactas • $present mal ubicadas — ¡otra vez!',
-      };
+        'enterNameTitle': [
+      'What should we call you?',
+      'آپ کو کیا کہیں؟',
+      'ما اسمك؟',
+      '¿Cómo te llamamos?'
+    ],
+    'enterNameDesc': [
+      'Enter your name so we can identify you for rewards and withdrawals.',
+      'اپنا نام درج کریں تاکہ انعامات اور رقم نکلوانے کے لیے آپ کی شناخت ہو سکے۔',
+      'أدخل اسمك حتى نتمكن من التعرف عليك للمكافآت والسحوبات.',
+      'Ingresa tu nombre para identificarte en recompensas y retiros.'
+    ],
+    'yourName': [
+      'Your name',
+      'آپ کا نام',
+      'اسمك',
+      'Tu nombre'
+    ],
+    'nameHint': [
+      'e.g. Ahmed Khan',
+      'مثلاً احمد خان',
+      'مثال: أحمد خان',
+      'p. ej. Ahmed Khan'
+    ],
+    'continueBtn': [
+      'Continue',
+      'جاری رکھیں',
+      'متابعة',
+      'Continuar'
+    ],
+    'premiumTitle': [
+      'Go Premium',
+      'پریمیم حاصل کریں',
+      'اشترك في المميز',
+      'Hazte Premium'
+    ],
+    'choosePackage': [
+      'Choose a package',
+      'پیکیج منتخب کریں',
+      'اختر الباقة',
+      'Elige un paquete'
+    ],
+    'package3mo': [
+      '3 Months Premium',
+      '3 ماہ پریمیم',
+      'المميز 3 أشهر',
+      'Premium 3 meses'
+    ],
+    'package6mo': [
+      '6 Months Premium',
+      '6 ماہ پریمیم',
+      'المميز 6 أشهر',
+      'Premium 6 meses'
+    ],
+    'premiumFeatures': [
+      '20 puzzles/day • No ads • Extra hints',
+      'روز 20 پہیلیاں • بغیر اشتہار • اضافی اشارے',
+      '20 لغزًا/يوم • بلا إعلانات • تلميحات إضافية',
+      '20 puzzles/día • Sin anuncios • Más pistas'
+    ],
+    'bestValue': [
+      'Best value',
+      'بہترین',
+      'الأفضل',
+      'Mejor valor'
+    ],
+    'howToPay': [
+      'How to pay',
+      'ادائیگی کا طریقہ',
+      'كيفية الدفع',
+      'Cómo pagar'
+    ],
+    'paymentRef': [
+      'Payment reference / Transaction ID',
+      'ادائیگی کا حوالہ / ٹرانزیکشن آئی ڈی',
+      'مرجع الدفع / معرف المعاملة',
+      'Referencia de pago / ID de transacción'
+    ],
+    'paymentRefHint': [
+      'Enter the ID from your payment app',
+      'اپنی پیمنٹ ایپ سے آئی ڈی درج کریں',
+      'أدخل المعرف من تطبيق الدفع',
+      'Ingresa el ID de tu app de pago'
+    ],
+    'submitApplication': [
+      'Submit Application',
+      'درخواست جمع کرائیں',
+      'إرسال الطلب',
+      'Enviar solicitud'
+    ],
+    'premiumNote': [
+      'Cash rewards are capped at 5 wins/day for everyone. Premium gives you more puzzles to enjoy!',
+      'کیش انعام سب کے لیے روزانہ 5 جیت تک ہے۔ پریمیم سے آپ کو کھیلنے کے لیے مزید پہیلیاں ملتی ہیں!',
+      'المكافآت النقدية محدودة بـ 5 انتصارات يوميًا للجميع. يمنحك المميز المزيد من الألغاز للاستمتاع!',
+      'Las recompensas están limitadas a 5 victorias/día para todos. ¡Premium te da más puzzles para disfrutar!'
+    ],
+    'applicationSubmitted': [
+      'Application Submitted!',
+      'درخواست جمع ہو گئی!',
+      'تم إرسال الطلب!',
+      '¡Solicitud enviada!'
+    ],
+    'applicationPending': [
+      'We will review your payment and activate premium soon.',
+      'ہم آپ کی ادائیگی کی تصدیق کرکے جلد پریمیم فعال کر دیں گے۔',
+      'سنراجع دفعتك ونفعّل المميز قريبًا.',
+      'Revisaremos tu pago y activaremos premium pronto.'
+    ],
+    'backBtn': [
+      'Back',
+      'واپس',
+      'رجوع',
+      'Atrás'
+    ],
+    'withdrawTitle': [
+      'Withdraw Earnings',
+      'رقم نکلوائیں',
+      'سحب الأرباح',
+      'Retirar ganancias'
+    ],
+    'yourBalance': [
+      'Your balance',
+      'آپ کا بیلنس',
+      'رصيدك',
+      'Tu saldo'
+    ],
+    'minWithdrawal': [
+      'Minimum',
+      'کم از کم',
+      'الحد الأدنى',
+      'Mínimo'
+    ],
+    'payoutMethod': [
+      'Payout method',
+      'ادائیگی کا طریقہ',
+      'طريقة الدفع',
+      'Método de pago'
+    ],
+    'accountDetails': [
+      'Account details',
+      'اکاؤنٹ کی تفصیلات',
+      'تفاصيل الحساب',
+      'Detalles de la cuenta'
+    ],
+    'accountDetailsHint': [
+      'Easypaisa number / USDT address etc.',
+      'ایزی پیسہ نمبر / USDT ایڈریس وغیرہ',
+      'رقم Easypaisa / عنوان USDT إلخ',
+      'Número Easypaisa / dirección USDT etc.'
+    ],
+    'requestWithdrawal': [
+      'Request Withdrawal',
+      'رقم نکلوانے کی درخواست',
+      'طلب السحب',
+      'Solicitar retiro'
+    ],
+    'withdrawLocked': [
+      'Reach $5.00 to unlock withdrawals. Keep playing!',
+      'رقم نکلوانے کے لیے $5.00 تک پہنچیں۔ کھیلتے رہیں!',
+      'اصِل إلى $5.00 لفتح السحوبات. واصل اللعب!',
+      '¡Llega a $5.00 para desbloquear retiros. Sigue jugando!'
+    ],
+    'withdrawSubmitted': [
+      'Request Submitted!',
+      'درخواست جمع ہو گئی!',
+      'تم إرسال الطلب!',
+      '¡Solicitud enviada!'
+    ],
+    'withdrawPending': [
+      'We will process your payment soon.',
+      'ہم جلد آپ کی ادائیگی کر دیں گے۔',
+      'سنعالج دفعتك قريبًا.',
+      'Procesaremos tu pago pronto.'
+    ],
+  };
 }
