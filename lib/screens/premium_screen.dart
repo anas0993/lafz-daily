@@ -33,14 +33,17 @@ class _PremiumScreenState extends State<PremiumScreen> {
   }
 
   Future<void> _loadInstructions() async {
-    final lang = context.read<AppState>().lang.code;
+    final lang = context.read<AppState>().lang.name;
     final text = await BackendService.instance.getSetting(
       'payment_instructions_$lang',
     );
     if (mounted) {
       setState(() {
         _instructions = text ??
-            'Send \$10 (3mo) or \$15 (6mo) via:\n(1) USDT (BEP20): 0x7021c100e43c8900bc5d6039583c390e87d3623c\n(2) Easypaisa IBAN: 4782780064795688\nThen submit your transaction ID below.';
+            'Send \$10 (3mo) or \$15 (6mo) via:
+(1) USDT (BEP20): 0x7021c100e43c8900bc5d6039583c390e87d3623c
+(2) Easypaisa IBAN: 4782780064795688
+Then submit your transaction ID below.';
       });
     }
   }
