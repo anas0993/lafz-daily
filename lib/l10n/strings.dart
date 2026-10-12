@@ -233,6 +233,18 @@ class S {
       'الجميع يحصل على نفس الكلمة. حافظ على سلسلتك!',
       'Todos reciben la misma palabra. ¡Mantén tu racha!'
     ],
+    'earnT': [
+      'Earn real rewards',
+      'اصل انعام کمائیں',
+      'اربح مكافآت حقيقية',
+      'Gana recompensas reales'
+    ],
+    'earnB': [
+      'Win any of the 5 daily puzzles to earn \$0.05. Each puzzle pays only once — practice games earn nothing. You can withdraw once your balance reaches \$5.00.',
+      'روز کی 5 پہیلیوں میں سے کوئی بھی جیتیں اور \$0.05 کمائیں۔ ہر پہیلی پر صرف ایک بار انعام ملتا ہے — مشق والے کھیل پر کچھ نہیں ملتا۔ بیلنس \$5.00 ہو جائے تو رقم نکلوا سکتے ہیں۔',
+      'اربح أيًّا من الألغاز اليومية الخمسة لتحصل على \$0.05. كل لغز يدفع مرة واحدة فقط — ألعاب التدريب لا تمنح شيئًا. يمكنك السحب عندما يصل رصيدك إلى \$5.00.',
+      'Gana cualquiera de los 5 puzzles diarios y recibe \$0.05. Cada puzzle paga una sola vez — la práctica no da recompensa. Podrás retirar cuando tu saldo llegue a \$5.00.'
+    ],
     'exampleWord': ['A sample word', 'مثال کے طور پر', 'كلمة للتوضيح', 'Palabra de ejemplo'],
     'version': ['Version', 'ورژن', 'الإصدار', 'Versión'],
     'notifTitle': ['Lafz Daily', 'لفظ ڈیلی', 'لفظ يومي', 'Lafz Diario'],
