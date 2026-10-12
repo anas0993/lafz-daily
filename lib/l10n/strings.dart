@@ -269,6 +269,18 @@ class S {
       'الجميع يحصل على نفس الكلمة. حافظ على سلسلتك!',
       'Todos reciben la misma palabra. ¡Mantén tu racha!'
     ],
+    'earnT': [
+      'Earn real rewards',
+      'اصل انعام کمائیں',
+      'اربح مكافآت حقيقية',
+      'Gana recompensas reales'
+    ],
+    'earnB': [
+      'Win any of the 5 daily puzzles to earn \$0.05. Each puzzle pays only once — practice games earn nothing. Withdraw once your balance reaches \$5.00. Premium: 20 daily puzzles — \$10 for 3 months, \$15 for 6 months.',
+      'روز کی 5 پہیلیوں میں سے کوئی بھی جیتیں اور \$0.05 کمائیں۔ ہر پہیلی پر صرف ایک بار انعام ملتا ہے — مشق والے کھیل پر کچھ نہیں ملتا۔ بیلنس \$5.00 ہو جائے تو رقم نکلوا سکتے ہیں۔ پریمیم: روز 20 پہیلیاں — 3 ماہ \$10، 6 ماہ \$15۔',
+      'اربح أيًّا من الألغاز اليومية الخمسة لتحصل على \$0.05. كل لغز يدفع مرة واحدة فقط — ألعاب التدريب لا تمنح شيئًا. يمكنك السحب عندما يصل رصيدك إلى \$5.00. المميز: 20 لغزًا يوميًا — \$10 لثلاثة أشهر، \$15 لستة أشهر.',
+      'Gana cualquiera de los 5 puzzles diarios y recibe \$0.05. Cada puzzle paga una sola vez — la práctica no da recompensa. Podrás retirar cuando tu saldo llegue a \$5.00. Premium: 20 puzzles diarios — \$10 por 3 meses, \$15 por 6 meses.'
+    ],
     'exampleWord': ['A sample word', 'مثال کے طور پر', 'كلمة للتوضيح', 'Palabra de ejemplo'],
     'version': ['Version', 'ورژن', 'الإصدار', 'Versión'],
     'notifTitle': ['Lafz Daily', 'لفظ ڈیلی', 'لفظ يومي', 'Lafz Diario'],
@@ -277,6 +289,33 @@ class S {
       'سلسلہ ٹوٹ گیا — آج کھیلیں!',
       'انقطعت السلسلة — العب اليوم!',
       '¡Racha perdida — juega hoy!'
+    ],
+    'balance': ['Balance', 'بیلنس', 'الرصيد', 'Saldo'],
+    'youWonReward': [
+      'You earned \$0.05!',
+      'آپ نے \$0.05 جیتے!',
+      'لقد ربحت \$0.05!',
+      '¡Ganaste \$0.05!'
+    ],
+    'dailyPuzzles': [
+      "Today's puzzles",
+      'آج کی پہیلیاں',
+      'ألغاز اليوم',
+      'Puzzles de hoy'
+    ],
+    'nextPuzzle': ['Next puzzle', 'اگلی پہیلی', 'اللغز التالي', 'Siguiente'],
+    'history': ['History', 'ہسٹری', 'السجل', 'Historial'],
+    'noHistory': [
+      'No earnings yet — win a daily puzzle!',
+      'ابھی کوئی کمائی نہیں — روزانہ پہیلی جیتیں!',
+      'لا أرباح بعد — اربح لغز اليوم!',
+      'Sin ganancias aún — ¡gana el puzzle diario!'
+    ],
+    'practiceEarnsNothing': [
+      'Practice is just for fun — only daily puzzles earn.',
+      'مشق صرف مزے کے لیے ہے — صرف روزانہ پہیلیوں پر کمائی ہوتی ہے۔',
+      'التدريب للمتعة فقط — الألغاز اليومية هي التي تربح.',
+      'La práctica es solo diversión — solo los puzzles diarios ganan.'
     ],
   };
 
@@ -296,5 +335,24 @@ class S {
         AppLang.ur => 'لفظ ڈیلی #$number',
         AppLang.ar => 'لفظ يومي #$number',
         AppLang.es => 'Lafz Diario #$number',
+      };
+
+  /// "Puzzle 3 of 5" for the daily slot header.
+  String puzzleOf(int i, int total) => switch (lang) {
+        AppLang.en => 'Puzzle $i of $total',
+        AppLang.ur => 'پہیلی $i از $total',
+        AppLang.ar => 'اللغز $i من $total',
+        AppLang.es => 'Puzzle $i de $total',
+      };
+
+  /// Feedback toast after a wrong (but valid) guess.
+  String guessFeedback(int correct, int present) => switch (lang) {
+        AppLang.en => '$correct exact • $present misplaced — try again!',
+        AppLang.ur =>
+          '$correct بالکل صحیح • $present غلط جگہ — دوبارہ کوشش کریں!',
+        AppLang.ar =>
+          '$correct في مكانها • $present في مكان خاطئ — حاول مجددًا!',
+        AppLang.es =>
+          '$correct exactas • $present mal ubicadas — ¡otra vez!',
       };
 }
