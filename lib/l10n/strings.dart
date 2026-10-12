@@ -240,10 +240,10 @@ class S {
       'Gana recompensas reales'
     ],
     'earnB': [
-      'Win any of the 5 daily puzzles to earn \$0.05. Each puzzle pays only once — practice games earn nothing. You can withdraw once your balance reaches \$5.00.',
-      'روز کی 5 پہیلیوں میں سے کوئی بھی جیتیں اور \$0.05 کمائیں۔ ہر پہیلی پر صرف ایک بار انعام ملتا ہے — مشق والے کھیل پر کچھ نہیں ملتا۔ بیلنس \$5.00 ہو جائے تو رقم نکلوا سکتے ہیں۔',
-      'اربح أيًّا من الألغاز اليومية الخمسة لتحصل على \$0.05. كل لغز يدفع مرة واحدة فقط — ألعاب التدريب لا تمنح شيئًا. يمكنك السحب عندما يصل رصيدك إلى \$5.00.',
-      'Gana cualquiera de los 5 puzzles diarios y recibe \$0.05. Cada puzzle paga una sola vez — la práctica no da recompensa. Podrás retirar cuando tu saldo llegue a \$5.00.'
+      'Win any of the 5 daily puzzles to earn \$0.05. Each puzzle pays only once — practice games earn nothing. Withdraw once your balance reaches \$5.00. Premium: 20 daily puzzles — \$10 for 3 months, \$15 for 6 months.',
+      'روز کی 5 پہیلیوں میں سے کوئی بھی جیتیں اور \$0.05 کمائیں۔ ہر پہیلی پر صرف ایک بار انعام ملتا ہے — مشق والے کھیل پر کچھ نہیں ملتا۔ بیلنس \$5.00 ہو جائے تو رقم نکلوا سکتے ہیں۔ پریمیم: روز 20 پہیلیاں — 3 ماہ \$10، 6 ماہ \$15۔',
+      'اربح أيًّا من الألغاز اليومية الخمسة لتحصل على \$0.05. كل لغز يدفع مرة واحدة فقط — ألعاب التدريب لا تمنح شيئًا. يمكنك السحب عندما يصل رصيدك إلى \$5.00. المميز: 20 لغزًا يوميًا — \$10 لثلاثة أشهر، \$15 لستة أشهر.',
+      'Gana cualquiera de los 5 puzzles diarios y recibe \$0.05. Cada puzzle paga una sola vez — la práctica no da recompensa. Podrás retirar cuando tu saldo llegue a \$5.00. Premium: 20 puzzles diarios — \$10 por 3 meses, \$15 por 6 meses.'
     ],
     'exampleWord': ['A sample word', 'مثال کے طور پر', 'كلمة للتوضيح', 'Palabra de ejemplo'],
     'version': ['Version', 'ورژن', 'الإصدار', 'Versión'],
