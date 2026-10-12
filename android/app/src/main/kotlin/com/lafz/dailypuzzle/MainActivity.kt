@@ -1,4 +1,4 @@
-package com.lafz.lafz_daily
+package com.lafz.dailypuzzle
 
 import io.flutter.embedding.android.FlutterActivity
 

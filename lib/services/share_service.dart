@@ -1,10 +1,11 @@
 import 'package:flutter/services.dart';
-import 'package:share_plus/share_plus.dart';
 import '../game/evaluator.dart';
 import '../l10n/strings.dart';
 
-/// Builds the emoji-square share text (Wordle-style, original branding).
+/// Stub: share disabled in the clean build. Copies to clipboard instead.
 class ShareService {
+  ShareService._();
+
   static String _square(LetterState s) => switch (s) {
         LetterState.correct => '🟩',
         LetterState.present => '🟨',
@@ -15,7 +16,7 @@ class ShareService {
     required S s,
     required int puzzleNumber,
     required bool won,
-    required int attempts, // attempts used (1..6) when won
+    required int attempts,
     required List<List<LetterState>> rows,
   }) {
     final tag = s.puzzleTag(puzzleNumber);
@@ -30,8 +31,7 @@ class ShareService {
     return buf.toString();
   }
 
-  static Future<void> share(String text) => Share.share(text);
-
-  static Future<void> copy(String text) =>
-      Clipboard.setData(ClipboardData(text: text));
+  static Future<void> share(String text) async {
+    await Clipboard.setData(ClipboardData(text: text));
+  }
 }

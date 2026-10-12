@@ -4,19 +4,11 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <!-- Daily reminder notifications (runtime permission on Android 13+). -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-    <!-- Google Play in-app billing (Pro upgrade). -->
-    <uses-permission android:name="com.android.vending.BILLING" />
     <application
         android:label="Lafz Daily"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
-        <!-- AdMob application ID. This is Google's official SAMPLE app ID,
-             safe for debug builds. Before the Play Store release, replace it
-             with the real AdMob app ID from https://apps.admob.com. -->
-        <meta-data
-            android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-3940256099942544~3347511713" />
-        <activity
+<activity
             android:name=".MainActivity"
             android:exported="true"
             android:launchMode="singleTop"

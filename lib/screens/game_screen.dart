@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart' hide AppState;
 import 'package:provider/provider.dart';
 import '../data/word_repository.dart';
 import '../game/lang_utils.dart';
@@ -56,32 +55,11 @@ class _GameView extends StatefulWidget {
 }
 
 class _GameViewState extends State<_GameView> {
-  BannerAd? _bannerAd;
   bool _dialogShown = false;
 
   @override
   void initState() {
     super.initState();
-    if (!BillingService.instance.isPro.value) {
-      _bannerAd = AdsService.instance.createBanner();
-    }
-    BillingService.instance.isPro.addListener(_onProChanged);
-  }
-
-  void _onProChanged() {
-    if (BillingService.instance.isPro.value && mounted) {
-      setState(() {
-        _bannerAd?.dispose();
-        _bannerAd = null;
-      });
-    }
-  }
-
-  @override
-  void dispose() {
-    BillingService.instance.isPro.removeListener(_onProChanged);
-    _bannerAd?.dispose();
-    super.dispose();
   }
 
   @override
@@ -165,12 +143,7 @@ class _GameViewState extends State<_GameView> {
               ),
             ),
             const SizedBox(height: 4),
-            if (_bannerAd != null)
-              SizedBox(
-                width: _bannerAd!.size.width.toDouble(),
-                height: _bannerAd!.size.height.toDouble(),
-                child: AdWidget(ad: _bannerAd!),
-              ),
+            AdsService.instance.createBanner(),
           ],
         ),
       ),
