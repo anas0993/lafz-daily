@@ -13,6 +13,7 @@ class Stats {
   int maxStreak = 0;
   List<int> distribution = List.filled(6, 0); // wins by guess count 1..6
   String lastPlayedDate = ''; // dateKey of last daily game
+  String lastWinDate = ''; // dateKey of last daily WIN (drives the streak)
 
   Stats();
 
@@ -26,6 +27,7 @@ class Stats {
       distribution = d.map((e) => (e as num).toInt()).toList();
     }
     lastPlayedDate = (j['lastPlayedDate'] as String?) ?? '';
+    lastWinDate = (j['lastWinDate'] as String?) ?? '';
   }
 
   Map<String, dynamic> toJson() => {
@@ -35,6 +37,7 @@ class Stats {
         'maxStreak': maxStreak,
         'distribution': distribution,
         'lastPlayedDate': lastPlayedDate,
+        'lastWinDate': lastWinDate,
       };
 
   double get winPct => played == 0 ? 0 : wins / played * 100;
@@ -78,17 +81,20 @@ class StatsService {
     if (isDaily && dateKey != null) {
       final todayKey = Puzzle.dateKey(DateTime.now());
       if (dateKey == todayKey) {
-        final yesterdayKey = Puzzle.dateKey(
-            DateTime.now().subtract(const Duration(days: 1)));
-        if (s.lastPlayedDate == yesterdayKey || s.lastPlayedDate.isEmpty) {
-          // Consecutive day (or first ever game).
-          s.currentStreak = won ? s.currentStreak + 1 : 0;
-        } else if (s.lastPlayedDate != todayKey) {
-          // Missed at least one day: streak restarts.
-          s.currentStreak = won ? 1 : 0;
+        // Streak = consecutive days with at least one daily WIN. With five
+        // puzzles a day, a single loss must not wipe the streak — only a
+        // winless day breaks it (detected on the next win).
+        if (won) {
+          final yesterdayKey = Puzzle.dateKey(
+              DateTime.now().subtract(const Duration(days: 1)));
+          if (s.lastWinDate == yesterdayKey || s.lastWinDate.isEmpty) {
+            s.currentStreak += 1;
+          } else if (s.lastWinDate != todayKey) {
+            s.currentStreak = 1;
+          }
+          if (s.currentStreak > s.maxStreak) s.maxStreak = s.currentStreak;
+          s.lastWinDate = todayKey;
         }
-        // Replaying today's puzzle: streak unchanged.
-        if (s.currentStreak > s.maxStreak) s.maxStreak = s.currentStreak;
         s.lastPlayedDate = todayKey;
       }
       // Archive dates: played/wins counted above, streak untouched.
