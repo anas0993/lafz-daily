@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../l10n/strings.dart';
 import '../main.dart';
 import '../services/billing_service.dart';
+import '../services/game_settings.dart';
 import '../services/notification_service.dart';
 import '../services/share_service.dart';
 import '../services/storage_service.dart';
@@ -83,6 +84,28 @@ class _SettingsScreenState extends State<SettingsScreen> {
             trailing: Text(NotificationService.instance.timeLabel),
             enabled: _reminderOn,
             onTap: _reminderOn ? () => _pickTime(context) : null,
+          ),
+          const Divider(),
+          // Gameplay
+          SwitchListTile(
+            secondary: const Icon(Icons.whatshot_rounded),
+            title: Text(s.get('hardMode')),
+            subtitle: Text(s.get('hardModeDesc')),
+            value: GameSettings.instance.hardMode,
+            onChanged: (v) async {
+              await GameSettings.instance.setHardMode(v);
+              if (mounted) setState(() {});
+            },
+          ),
+          SwitchListTile(
+            secondary: const Icon(Icons.contrast_rounded),
+            title: Text(s.get('colorBlind')),
+            subtitle: Text(s.get('colorBlindDesc')),
+            value: GameSettings.instance.colorBlind,
+            onChanged: (v) async {
+              await GameSettings.instance.setColorBlind(v);
+              if (mounted) setState(() {});
+            },
           ),
           const Divider(),
           // Pro

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart' hide AppState;
 import 'package:provider/provider.dart';
 import '../data/word_repository.dart';
 import '../game/lang_utils.dart';
@@ -10,28 +11,26 @@ import '../services/billing_service.dart';
 import '../services/share_service.dart';
 import '../services/stats_service.dart';
 import '../state/game_controller.dart';
+import '../widgets/confetti_celebration.dart';
 import '../widgets/game_board.dart';
 import '../widgets/game_keyboard.dart';
 import 'stats_screen.dart';
 
 /// Game screen. Use the named constructors:
-///   GameScreen.daily()            — today's puzzle (slot 0..4, five a day)
+///   GameScreen.daily()            — today's puzzle
 ///   GameScreen.dailyAt(date)      — archive puzzle (Pro)
-///   GameScreen.practice()         — unlimited random words (no earnings)
+///   GameScreen.practice()         — unlimited random words
 class GameScreen extends StatelessWidget {
   final GameMode mode;
   final DateTime? date;
-  final int slot;
 
-  const GameScreen.daily({super.key, this.slot = 0})
+  const GameScreen.daily({super.key})
       : mode = GameMode.daily,
         date = null;
-  const GameScreen.dailyAt(this.date, {super.key, this.slot = 0})
-      : mode = GameMode.daily;
+  const GameScreen.dailyAt(this.date, {super.key}) : mode = GameMode.daily;
   const GameScreen.practice({super.key})
       : mode = GameMode.practice,
-        date = null,
-        slot = 0;
+        date = null;
 
   @override
   Widget build(BuildContext context) {
@@ -42,7 +41,6 @@ class GameScreen extends StatelessWidget {
           repo: WordRepository(appState.lang),
           mode: mode,
           date: date,
-          slot: slot,
         );
         c.loadHints();
         return c;
@@ -59,11 +57,32 @@ class _GameView extends StatefulWidget {
 }
 
 class _GameViewState extends State<_GameView> {
+  BannerAd? _bannerAd;
   bool _dialogShown = false;
 
   @override
   void initState() {
     super.initState();
+    if (!BillingService.instance.isPro.value) {
+      _bannerAd = AdsService.instance.createBanner();
+    }
+    BillingService.instance.isPro.addListener(_onProChanged);
+  }
+
+  void _onProChanged() {
+    if (BillingService.instance.isPro.value && mounted) {
+      setState(() {
+        _bannerAd?.dispose();
+        _bannerAd = null;
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    BillingService.instance.isPro.removeListener(_onProChanged);
+    _bannerAd?.dispose();
+    super.dispose();
   }
 
   @override
@@ -82,7 +101,7 @@ class _GameViewState extends State<_GameView> {
     }
 
     final title = mode == GameMode.daily
-        ? '${s.puzzleTag(game.puzzleNumber)} • ${game.slot + 1}/${Puzzle.puzzlesPerDay}'
+        ? s.puzzleTag(game.puzzleNumber)
         : s.get('practiceMode');
 
     return Scaffold(
@@ -102,26 +121,6 @@ class _GameViewState extends State<_GameView> {
       body: SafeArea(
         child: Column(
           children: [
-            SizedBox(
-              height: 44,
-              child: Center(
-                child: game.toast == null
-                    ? const SizedBox.shrink()
-                    : Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 20, vertical: 9),
-                        decoration: BoxDecoration(
-                          color: Theme.of(context)
-                              .colorScheme
-                              .surfaceContainerHighest,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Text(game.toast!,
-                            style: const TextStyle(
-                                fontWeight: FontWeight.w700, fontSize: 17)),
-                      ),
-              ),
-            ),
             Expanded(
               child: SingleChildScrollView(
                 child: Padding(
@@ -133,6 +132,26 @@ class _GameViewState extends State<_GameView> {
                     lang: appState.lang,
                   ),
                 ),
+              ),
+            ),
+            SizedBox(
+              height: 28,
+              child: Center(
+                child: game.toast == null
+                    ? const SizedBox.shrink()
+                    : Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 14, vertical: 5),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context)
+                              .colorScheme
+                              .surfaceContainerHighest,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(game.toast!,
+                            style:
+                                const TextStyle(fontWeight: FontWeight.w600)),
+                      ),
               ),
             ),
             Padding(
@@ -147,7 +166,12 @@ class _GameViewState extends State<_GameView> {
               ),
             ),
             const SizedBox(height: 4),
-            AdsService.instance.createBanner(),
+            if (_bannerAd != null)
+              SizedBox(
+                width: _bannerAd!.size.width.toDouble(),
+                height: _bannerAd!.size.height.toDouble(),
+                child: AdWidget(ad: _bannerAd!),
+              ),
           ],
         ),
       ),
@@ -161,7 +185,9 @@ class _GameViewState extends State<_GameView> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (ctx) => AlertDialog(
+      builder: (ctx) => Stack(
+        children: [
+          AlertDialog(
         title: Text(game.isWon ? s.get('youWon') : s.get('youLost')),
         content: Column(
           mainAxisSize: MainAxisSize.min,
@@ -177,18 +203,6 @@ class _GameViewState extends State<_GameView> {
               ),
             Text(
                 '${s.get('curStreak')}: ${stats.currentStreak}   •   ${s.get('played')}: ${stats.played}'),
-            if (game.mode == GameMode.daily && game.isWon && game.justEarned) ...[
-              const SizedBox(height: 8),
-              Text(
-                '🎉 ${s.get('youWonReward')}',
-                style: const TextStyle(fontWeight: FontWeight.w700),
-              ),
-            ],
-            if (game.mode == GameMode.practice && game.isWon) ...[
-              const SizedBox(height: 8),
-              Text(s.get('practiceEarnsNothing'),
-                  style: const TextStyle(fontSize: 13)),
-            ],
             if (game.mode == GameMode.daily) ...[
               const SizedBox(height: 8),
               Text(
@@ -203,19 +217,6 @@ class _GameViewState extends State<_GameView> {
             },
             child: Text(s.get('share')),
           ),
-          if (game.mode == GameMode.daily &&
-              game.slot + 1 < Puzzle.puzzlesPerDay)
-            FilledButton.tonal(
-              onPressed: () {
-                Navigator.of(ctx).pop();
-                Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(
-                      builder: (_) =>
-                          GameScreen.daily(slot: game.slot + 1)),
-                );
-              },
-              child: Text(s.get('nextPuzzle')),
-            ),
           if (game.mode == GameMode.practice)
             TextButton(
               onPressed: () {
@@ -231,6 +232,10 @@ class _GameViewState extends State<_GameView> {
             onPressed: () => Navigator.of(ctx).pop(),
             child: Text(s.get('ok')),
           ),
+        ],
+          ),
+          // Confetti rains on wins!
+          if (game.isWon) const ConfettiCelebration(),
         ],
       ),
     );
