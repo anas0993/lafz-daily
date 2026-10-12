@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../game/evaluator.dart';
 import '../game/lang_utils.dart';
 import '../l10n/strings.dart';
+import '../services/game_settings.dart';
 
 /// On-screen keyboard with per-letter color states.
 /// Latin languages: QWERTY. Urdu/Arabic: 4-row layouts covering every
@@ -50,9 +51,12 @@ class GameKeyboard extends StatelessWidget {
   Color _keyColor(BuildContext context, String key) {
     final st = keyStates[lang.normalizeWord(key)] ?? LetterState.unknown;
     final scheme = Theme.of(context).colorScheme;
+    final colorBlind = GameSettings.instance.colorBlind;
     return switch (st) {
-      LetterState.correct => const Color(0xFF4C9A52),
-      LetterState.present => const Color(0xFFC9A227),
+      LetterState.correct =>
+        colorBlind ? const Color(0xFFF5793A) : const Color(0xFF4C9A52),
+      LetterState.present =>
+        colorBlind ? const Color(0xFF85C0F9) : const Color(0xFFC9A227),
       LetterState.absent => const Color(0xFF787C7E),
       LetterState.unknown => scheme.surfaceContainerHighest,
     };

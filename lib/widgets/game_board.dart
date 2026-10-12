@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../game/evaluator.dart';
 import '../game/lang_utils.dart';
 import '../l10n/strings.dart';
+import '../services/game_settings.dart';
 
 /// The 6x5 tile board. Tiles flip-reveal after each submitted guess.
 class GameBoard extends StatelessWidget {
@@ -68,9 +69,12 @@ class _Tile extends StatelessWidget {
 
   Color _bg(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final colorBlind = GameSettings.instance.colorBlind;
     return switch (state) {
-      LetterState.correct => const Color(0xFF4C9A52),
-      LetterState.present => const Color(0xFFC9A227),
+      LetterState.correct =>
+        colorBlind ? const Color(0xFFF5793A) : const Color(0xFF4C9A52),
+      LetterState.present =>
+        colorBlind ? const Color(0xFF85C0F9) : const Color(0xFFC9A227),
       LetterState.absent => const Color(0xFF787C7E),
       LetterState.unknown =>
         filled ? scheme.surfaceContainerHighest : scheme.surface,
