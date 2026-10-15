@@ -40,5 +40,5 @@ class AppConfig {
 
   /// Play Store URL used by the "Rate us" button (updated at release).
   static const String playStoreUrl =
-      'https://play.google.com/store/apps/details?id=com.lafz.dailypuzzle';
+      'https://play.google.com/store/apps/details?id=com.dailymint.worddaily';
 }
