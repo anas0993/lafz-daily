@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.lafz.dailypuzzle"
+    namespace = "com.dailymint.worddaily"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -33,7 +33,7 @@ android {
 
     defaultConfig {
         // Unique application ID for the Play Store listing.
-        applicationId = "com.lafz.dailypuzzle"
+        applicationId = "com.dailymint.worddaily"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = 24
