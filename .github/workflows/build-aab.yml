@@ -29,8 +29,8 @@ jobs:
 
       - name: Decode keystore
         run: |
-          echo "${{ secrets.UPLOAD_KEYSTORE_BASE64 }}" | base64 -d > /tmp/upload-keystore.p12
-          echo "KEYSTORE_PATH=/tmp/upload-keystore.p12" >> $GITHUB_ENV
+          echo "${{ secrets.UPLOAD_KEYSTORE_BASE64 }}" | base64 -d > /tmp/upload-keystore.jks
+          echo "KEYSTORE_PATH=/tmp/upload-keystore.jks" >> $GITHUB_ENV
 
       - name: Build release AAB
         run: flutter build appbundle --release --dart-define=SUPABASE_URL=https://qetgxtjxsgmengtlqulj.supabase.co --dart-define=SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFldGd4dGp4c2dtZW5ndGxxdWxqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4MDk5MTIsImV4cCI6MjEwNzM4NTkxMn0.YII5OUEm7xo9tfZy9Zz1Dz5w1OfU1QRSCR2p-ZYWf6M
