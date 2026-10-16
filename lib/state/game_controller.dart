@@ -8,7 +8,6 @@ import '../l10n/strings.dart';
 import '../services/ads_service.dart';
 import '../services/billing_service.dart';
 import '../services/game_settings.dart';
-import '../services/points_service.dart';
 import '../services/remote_content_service.dart';
 import '../services/share_service.dart';
 import '../services/stats_service.dart';
@@ -223,9 +222,9 @@ class GameController extends ChangeNotifier {
 
   bool _finishedNotified = false;
 
-  /// True when this win freshly credited $0.05 (used by the result dialog).
-  bool _justEarned = false;
-  bool get justEarned => _justEarned;
+  // EARNING DISABLED (interim no-rewards build): cash rewards removed so the
+  // app can ship on a personal Play Console account. The PointsService code
+  // is kept intact for re-enabling after the organization-account transfer.
 
   Future<void> _onFinished() async {
     if (_finishedNotified) return;
@@ -240,17 +239,9 @@ class GameController extends ChangeNotifier {
         dateKey: mode == GameMode.daily ? calendarDateKey : null,
       );
     } catch (_) {
-      // Stats failed - continue to rewards anyway
+      // Stats failed - continue anyway
     }
-    // $0.05 per daily win, credited exactly once per puzzle. Practice
-    // games never earn (otherwise the reward could be farmed).
-    if (mode == GameMode.daily && isWon) {
-      try {
-        _justEarned = await PointsService.instance.awardDailyWin(_saveKey);
-      } catch (_) {
-        _justEarned = false;
-      }
-    }
+    // EARNING DISABLED (interim build): no cash rewards credited.
     notifyListeners();
     // Interstitial: at most once/day, only after the daily puzzle ends,
     // never in the middle of a game. Practice mode never triggers it.
