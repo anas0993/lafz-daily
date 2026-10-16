@@ -1,7 +1,7 @@
 name: word_daily
 description: "Word Daily — a daily word puzzle game in English, Urdu, Arabic and Spanish."
 publish_to: "none"
-version: 1.0.0+2
+version: 1.0.0+3
 
 environment:
   sdk: ^3.4.0
