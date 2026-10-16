@@ -4,7 +4,6 @@ import '../config/app_config.dart';
 import '../game/puzzle.dart';
 import '../l10n/strings.dart';
 import '../main.dart';
-import '../services/points_service.dart';
 import '../services/stats_service.dart';
 import '../state/game_controller.dart';
 import 'archive_screen.dart';
@@ -22,9 +21,9 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final appState = context.watch<AppState>();
     final s = appState.s;
-    // Watch reactive services so UI updates when stats/balance change
+    // Watch reactive services so UI updates when stats change
+    // (EARNING DISABLED in interim build: PointsService not watched)
     context.watch<StatsService>();
-    context.watch<PointsService>();
     final stats = StatsService.instance.get(appState.lang);
     final scheme = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -110,11 +109,14 @@ class HomeScreen extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(width: 12),
+                      // EARNING DISABLED (interim build): wins card replaces
+                      // the old balance card. Cash rewards return after the
+                      // organization-account transfer.
                       Expanded(
                         child: _StatCard(
-                          icon: '💰',
-                          value: PointsService.instance.balanceText,
-                          label: s.get('balance'),
+                          icon: '🏆',
+                          value: '${stats.wins}',
+                          label: s.get('wins'),
                           color: Colors.green,
                         ),
                       ),
