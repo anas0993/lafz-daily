@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../game/evaluator.dart';
 import '../game/lang_utils.dart';
 import '../l10n/strings.dart';
 import '../services/game_settings.dart';
+import 'wood_theme.dart';
 
 /// On-screen keyboard with per-letter color states.
 /// Latin languages: QWERTY. Urdu/Arabic: 4-row layouts covering every
@@ -50,24 +52,25 @@ class GameKeyboard extends StatelessWidget {
 
   Color _keyColor(BuildContext context, String key) {
     final st = keyStates[lang.normalizeWord(key)] ?? LetterState.unknown;
-    final scheme = Theme.of(context).colorScheme;
     final colorBlind = GameSettings.instance.colorBlind;
+    // Cream/wood tones: unpressed keys are cream, correct is emerald,
+    // present is gold, absent is a warm brown-grey.
     return switch (st) {
       LetterState.correct =>
-        colorBlind ? const Color(0xFFFF6B35) : const Color(0xFF00C853),
+        colorBlind ? const Color(0xFFFF6B35) : WoodTheme.emerald,
       LetterState.present =>
-        colorBlind ? const Color(0xFF40C4FF) : const Color(0xFFFFD600),
-      LetterState.absent => const Color(0xFF616161),
-      LetterState.unknown => scheme.surfaceContainerHighest,
+        colorBlind ? const Color(0xFF40C4FF) : WoodTheme.gold,
+      LetterState.absent => const Color(0xFF6D4C41),
+      LetterState.unknown => WoodTheme.cream,
     };
   }
 
   Color _keyFg(BuildContext context, String key) {
-    final st =
-        keyStates[lang.normalizeWord(key)] ?? LetterState.unknown;
-    return st == LetterState.unknown
-        ? Theme.of(context).colorScheme.onSurface
-        : Colors.white;
+    final st = keyStates[lang.normalizeWord(key)] ?? LetterState.unknown;
+    // Dark wood text on the light (cream/gold) keys, white on dark keys.
+    final darkText =
+        st == LetterState.unknown || st == LetterState.present;
+    return darkText ? WoodTheme.bark : Colors.white;
   }
 
   @override
@@ -119,6 +122,12 @@ class GameKeyboard extends StatelessWidget {
   }
 }
 
+/// Shared press feedback for every keyboard tap: light haptic + click.
+void _keyPressFeedback() {
+  HapticFeedback.lightImpact();
+  SystemSound.play(SystemSoundType.click);
+}
+
 class _Key extends StatelessWidget {
   const _Key(
       {required this.label,
@@ -132,32 +141,41 @@ class _Key extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isRevealed = color != Theme.of(context).colorScheme.surfaceContainerHighest;
+    final isRevealed = color != WoodTheme.cream;
     return Expanded(
       child: InkWell(
-        onTap: onTap,
+        onTap: () {
+          _keyPressFeedback();
+          onTap();
+        },
         borderRadius: BorderRadius.circular(8),
         child: Container(
           height: 56,
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: color,
+            // Subtle 3D wooden-key gradient.
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                WoodTheme.lighten(color, 0.12),
+                color,
+                WoodTheme.darken(color, 0.14),
+              ],
+              stops: const [0.0, 0.5, 1.0],
+            ),
             borderRadius: BorderRadius.circular(8),
-            boxShadow: isRevealed
-                ? [
-                    BoxShadow(
-                      color: color.withOpacity(0.3),
-                      blurRadius: 4,
-                      offset: const Offset(0, 2),
-                    ),
-                  ]
-                : [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
-                      blurRadius: 2,
-                      offset: const Offset(0, 1),
-                    ),
-                  ],
+            border: Border.all(
+              color: WoodTheme.woodLight.withValues(alpha: 0.25),
+              width: 1,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: isRevealed ? 0.25 : 0.12),
+                blurRadius: isRevealed ? 5 : 3,
+                offset: Offset(0, isRevealed ? 2.5 : 1.5),
+              ),
+            ],
           ),
           child: Text(label,
               style: TextStyle(
@@ -180,24 +198,46 @@ class _WideKey extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
     return Expanded(
       flex: flex,
       child: InkWell(
-        onTap: onTap,
+        onTap: () {
+          _keyPressFeedback();
+          onTap();
+        },
         borderRadius: BorderRadius.circular(6),
         child: Container(
           height: 52,
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: scheme.surfaceContainerHighest,
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                WoodTheme.lighten(WoodTheme.creamDeep, 0.1),
+                WoodTheme.creamDeep,
+                WoodTheme.darken(WoodTheme.creamDeep, 0.12),
+              ],
+              stops: const [0.0, 0.5, 1.0],
+            ),
             borderRadius: BorderRadius.circular(6),
+            border: Border.all(
+              color: WoodTheme.woodLight.withValues(alpha: 0.35),
+              width: 1,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.12),
+                blurRadius: 3,
+                offset: const Offset(0, 1.5),
+              ),
+            ],
           ),
           child: Text(label,
-              style: TextStyle(
+              style: const TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w700,
-                  color: scheme.onSurface)),
+                  color: WoodTheme.bark)),
         ),
       ),
     );

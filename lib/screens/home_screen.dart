@@ -4,15 +4,24 @@ import '../config/app_config.dart';
 import '../game/puzzle.dart';
 import '../l10n/strings.dart';
 import '../main.dart';
+import '../services/coins_service.dart';
+import '../services/rewards_service.dart';
 import '../services/stats_service.dart';
 import '../state/game_controller.dart';
+import '../widgets/ad_slot.dart';
+import 'achievements_screen.dart';
 import 'archive_screen.dart';
+import 'challenge_screen.dart';
 import 'game_screen.dart';
 import 'how_to_play_screen.dart';
+import 'leaderboard_screen.dart';
+import 'scramble_screen.dart';
 import 'settings_screen.dart';
 import 'splash_screen.dart';
 import 'premium_screen.dart';
 import 'stats_screen.dart';
+import 'team_screen.dart';
+import 'tournament_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -74,6 +83,8 @@ class HomeScreen extends StatelessWidget {
               ),
             ),
             actions: [
+              // v4: virtual coin balance.
+              const _CoinChip(),
               IconButton(
                 tooltip: s.get('stats'),
                 icon: const Icon(Icons.bar_chart_rounded, color: Colors.white),
@@ -97,6 +108,8 @@ class HomeScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
+                  // v4: daily login reward check (zero-size widget).
+                  const _DailyRewardCheck(),
                   // Stats cards row
                   Row(
                     children: [
@@ -213,6 +226,18 @@ class HomeScreen extends StatelessWidget {
                               builder: (_) => const GameScreen.practice()),
                         ),
                       ),
+                      // WORKSTREAM 2 (GAMEPLAY): Scramble mode entry — small,
+                      // clearly-marked addition next to the other modes.
+                      _ActionCard(
+                        icon: Icons.shuffle_rounded,
+                        title: s.get('scramble'),
+                        subtitle: s.get('scrambleSub'),
+                        color: Colors.pink,
+                        onTap: () => Navigator.of(context).push(
+                          MaterialPageRoute(
+                              builder: (_) => const ScrambleScreen()),
+                        ),
+                      ),
                       _ActionCard(
                         icon: Icons.history_rounded,
                         title: s.get('archive'),
@@ -244,10 +269,71 @@ class HomeScreen extends StatelessWidget {
                               builder: (_) => const StatsScreen()),
                         ),
                       ),
+                      // v4: social / retention entries.
+                      _ActionCard(
+                        icon: Icons.sports_esports_outlined,
+                        title: s.get('challengeTitle'),
+                        subtitle: '',
+                        color: Colors.redAccent,
+                        onTap: () => Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => ChallengeScreen(
+                              onPlayWord: (word) =>
+                                  Navigator.of(context).push(
+                                MaterialPageRoute(
+                                    builder: (_) =>
+                                        GameScreen.challenge(word)),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      _ActionCard(
+                        icon: Icons.groups_outlined,
+                        title: s.get('team'),
+                        subtitle: '',
+                        color: Colors.green,
+                        onTap: () => Navigator.of(context).push(
+                          MaterialPageRoute(
+                              builder: (_) => const TeamScreen()),
+                        ),
+                      ),
+                      _ActionCard(
+                        icon: Icons.leaderboard_outlined,
+                        title: s.get('leaderboard'),
+                        subtitle: '',
+                        color: Colors.amber,
+                        onTap: () => Navigator.of(context).push(
+                          MaterialPageRoute(
+                              builder: (_) => const LeaderboardScreen()),
+                        ),
+                      ),
+                      _ActionCard(
+                        icon: Icons.emoji_events_outlined,
+                        title: s.get('achievements'),
+                        subtitle: '',
+                        color: Colors.deepPurple,
+                        onTap: () => Navigator.of(context).push(
+                          MaterialPageRoute(
+                              builder: (_) => const AchievementsScreen()),
+                        ),
+                      ),
+                      _ActionCard(
+                        icon: Icons.military_tech_outlined,
+                        title: s.get('tournament'),
+                        subtitle: '',
+                        color: Colors.cyan,
+                        onTap: () => Navigator.of(context).push(
+                          MaterialPageRoute(
+                              builder: (_) => const TournamentScreen()),
+                        ),
+                      ),
                     ],
                   ),
 
                   const SizedBox(height: 24),
+                  // v4: ad placement slot (banner).
+                  const AdSlot(slotName: 'home_bottom'),
                 ],
               ),
             ),
@@ -624,6 +710,83 @@ class _ActionCard extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+/// v4: zero-size widget that checks the daily login reward once and shows
+/// the reward dialog when a new day streak starts.
+class _DailyRewardCheck extends StatefulWidget {
+  const _DailyRewardCheck();
+  @override
+  State<_DailyRewardCheck> createState() => _DailyRewardCheckState();
+}
+
+class _DailyRewardCheckState extends State<_DailyRewardCheck> {
+  bool _checked = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _check());
+  }
+
+  Future<void> _check() async {
+    if (_checked) return;
+    _checked = true;
+    try {
+      final reward = await RewardsService.instance.checkDailyReward();
+      if (reward != null && mounted) {
+        final s = context.read<AppState>().s;
+        await showDialog(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            title: Text('🎁 ${s.get('dailyReward')}'),
+            content: Text(
+              '${s.get('dailyRewardSub')}\n\n${s.get('comeBackTomorrow')}',
+            ),
+            actions: [
+              FilledButton(
+                onPressed: () => Navigator.of(ctx).pop(),
+                child: Text('${s.get('claim')} +${reward.coins} 🪙'),
+              ),
+            ],
+          ),
+        );
+      }
+    } catch (_) {/* rewards must never break home */}
+  }
+
+  @override
+  Widget build(BuildContext context) => const SizedBox.shrink();
+}
+
+/// v4: virtual coin balance chip shown in the home app bar.
+class _CoinChip extends StatelessWidget {
+  const _CoinChip();
+  @override
+  Widget build(BuildContext context) {
+    return ListenableBuilder(
+      listenable: CoinsService.instance,
+      builder: (context, _) => const Padding(
+        padding: EdgeInsets.only(right: 2),
+        child: Chip(
+          avatar: Text('🪙', style: TextStyle(fontSize: 14)),
+          label: _CoinChipLabel(),
+          visualDensity: VisualDensity.compact,
+        ),
+      ),
+    );
+  }
+}
+
+class _CoinChipLabel extends StatelessWidget {
+  const _CoinChipLabel();
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      '${CoinsService.instance.balance}',
+      style: const TextStyle(fontWeight: FontWeight.w800),
     );
   }
 }

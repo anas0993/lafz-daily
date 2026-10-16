@@ -12,6 +12,7 @@ import 'services/billing_service.dart';
 import 'services/notification_service.dart';
 import 'services/remote_content_service.dart';
 import 'services/storage_service.dart';
+import 'widgets/wood_theme.dart';
 
 /// Global app state: the single language setting (EN/اردو/عربية/ES),
 /// persisted. The setting switches both the UI and the puzzle language.
@@ -87,7 +88,7 @@ class WordDailyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final appState = context.watch<AppState>();
-    const seed = Color(0xFF0F766E);
+    const seed = WoodTheme.emerald;
     return MaterialApp(
       title: 'Word Daily',
       debugShowCheckedModeBanner: false,

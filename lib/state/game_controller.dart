@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/foundation.dart';
 import '../config/app_config.dart';
 import '../data/word_repository.dart';
@@ -13,7 +15,7 @@ import '../services/share_service.dart';
 import '../services/stats_service.dart';
 import '../services/storage_service.dart';
 
-enum GameMode { daily, practice }
+enum GameMode { daily, practice, challenge }
 
 /// Holds all mutable state for one game session:
 /// board rows, evaluations, keyboard colors, hints, and persistence.
@@ -29,10 +31,13 @@ class GameController extends ChangeNotifier {
     required this.mode,
     DateTime? date, // only for daily (archive support)
     this.slot = 0, // daily puzzle slot 0..(puzzlesPerDay-1)
+    this.challengeAnswer, // required when mode == GameMode.challenge
   })  : _date = date ?? DateTime.now(),
         _answer = mode == GameMode.daily
             ? repo.dailyAnswerForSlot(slot, date ?? DateTime.now())
-            : repo.randomAnswer() {
+            : mode == GameMode.challenge
+                ? challengeAnswer!
+                : repo.randomAnswer() {
     _answerLetters = repo.answerLetters(_answer);
     _loadSaved();
   }
@@ -43,6 +48,10 @@ class GameController extends ChangeNotifier {
 
   /// Daily puzzle slot 0..(puzzlesPerDay-1). Ignored in practice mode.
   final int slot;
+
+  /// Custom answer for 1v1 challenge games (mode == GameMode.challenge).
+  /// Treated like practice for persistence/stats (no save, non-daily stats).
+  final String? challengeAnswer;
 
   late final String _answer;
   late final List<String> _answerLetters;
@@ -70,12 +79,9 @@ class GameController extends ChangeNotifier {
   String? _toast;
   String? get toast => _toast;
 
-  int _hints = 0; // hints banked (free daily + rewarded)
-  int get hints => _hints;
-
   // ---------------------------------------------------------- storage --
   String get _saveKey =>
-      'game_${repo.lang.name}_${mode.name}_${mode == GameMode.daily ? dateKey : _answer}';
+      'game_${repo.lang.name}_${mode.name}_${mode == GameMode.daily ? dateKey : (mode == GameMode.challenge ? _practiceId : _answer)}';
 
   /// Save key for a daily puzzle slot (used by the home screen to show
   /// which of today's 5 puzzles are already done).
@@ -123,7 +129,8 @@ class GameController extends ChangeNotifier {
     if (isFinished) return;
     final l = repo.lang;
     final norm = l.normalizeWord(letter);
-    if (l.splitLetters(current).length >= _maxLen) return;
+    // Hint-locked tiles occupy slots, so fewer typed letters fit.
+    if (l.splitLetters(current).length >= _maxLen - hintLocks.length) return;
     current = l.normalizeWord(current + norm);
     _toast = null;
     notifyListeners();
@@ -142,10 +149,16 @@ class GameController extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Counts invalid-word submits (guess not in the word list). The game
+  /// screen watches this to play the shake + red-flash feedback.
+  int _invalidSubmits = 0;
+  int get invalidSubmits => _invalidSubmits;
+
   /// Submits the current guess. Returns a toast message key on invalid input.
   Future<void> submit(S s) async {
     if (isFinished) return;
-    final guess = repo.lang.normalizeWord(current);
+    // Merge hint-locked letters with typed letters (spaces = empty slots).
+    final guess = repo.lang.normalizeWord(currentRow).replaceAll(' ', '');
     if (guess.runes.length < AppConfig.wordLength) {
       _toast = s.get('notEnough');
       notifyListeners();
@@ -153,6 +166,7 @@ class GameController extends ChangeNotifier {
     }
     if (!repo.isValidGuess(guess)) {
       _toast = s.get('notInList');
+      _invalidSubmits++;
       notifyListeners();
       return;
     }
@@ -168,6 +182,7 @@ class GameController extends ChangeNotifier {
     final ev = evaluateGuess(_split(guess), _answerLetters);
     evaluations.add(ev);
     current = '';
+    hintLocks.clear();
     _rebuildKeyStates();
     if (isFinished) {
       // Win/loss get the result dialog; no toast needed.
@@ -252,6 +267,55 @@ class GameController extends ChangeNotifier {
   }
 
   // ------------------------------------------------------------- hint ---
+  // WORKSTREAM 2 (GAMEPLAY): free-hint system.
+  //
+  // Every puzzle grants 2 free hints, persisted per puzzle (key includes
+  // language + mode + date/slot for daily, unique id for practice).
+  // A hint reveals ONE correct letter in a RANDOM unrevealed position of
+  // the current row and locks that tile: typing fills around it and
+  // backspace can't remove it.
+  // Free hints are consumed first; the banked pool (rewarded ads, and
+  // later coin purchases via addHints) is consumed afterwards.
+  static const int freeHintsPerPuzzle = 2;
+
+  int _freeHints = 0; // free hints left for THIS puzzle
+  int get freeHintsLeft => _freeHints;
+
+  int _hints = 0; // banked hints (rewarded ads / future coin purchases)
+
+  /// Total usable hints right now (free + banked). Shown as 💡×N.
+  int get hints => _freeHints + _hints;
+
+  /// Locked positions in the current row: position -> correct letter.
+  final Map<int, String> hintLocks = {};
+
+  /// Unique id so every practice game gets its own free-hint budget.
+  final String _practiceId = DateTime.now().microsecondsSinceEpoch.toString();
+
+  String get _freeHintKey {
+    final scope = mode == GameMode.daily ? dateKey : '${_answer}_$_practiceId';
+    return 'hint_free_${repo.lang.name}_${mode.name}_$scope';
+  }
+
+  /// The current row as shown on the board: hint-locked letters fixed in
+  /// place, typed letters filling the unlocked slots, spaces elsewhere.
+  String get currentRow {
+    if (hintLocks.isEmpty) return current;
+    final typed = _split(current);
+    final out = List<String>.filled(AppConfig.wordLength, ' ');
+    for (final e in hintLocks.entries) {
+      if (e.key >= 0 && e.key < out.length) out[e.key] = e.value;
+    }
+    var ti = 0;
+    for (var i = 0; i < out.length && ti < typed.length; i++) {
+      if (out[i] == ' ') {
+        out[i] = typed[ti];
+        ti++;
+      }
+    }
+    return out.join();
+  }
+
   Future<void> loadHints() async {
     final store = StorageService.instance;
     final today = Puzzle.dateKey(DateTime.now());
@@ -261,6 +325,7 @@ class GameController extends ChangeNotifier {
           RemoteContentService.instance.effectiveFreeHintsPerDay);
     }
     _hints = store.getInt('hints_banked') ?? 0;
+    _freeHints = store.getInt(_freeHintKey) ?? freeHintsPerPuzzle;
     notifyListeners();
   }
 
@@ -270,27 +335,46 @@ class GameController extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Reveals one correct letter in the current row (first unknown position).
-  /// Returns false when no hint could be applied.
+  Future<void> _setFreeHints(int v) async {
+    _freeHints = v;
+    await StorageService.instance.setInt(_freeHintKey, v);
+    notifyListeners();
+  }
+
+  /// Adds [n] hints to the banked pool.
+  /// PARENT HOOK: coin-purchased hints should call this.
+  Future<void> addHints(int n) async {
+    if (n <= 0) return;
+    await _setHints(_hints + n);
+  }
+
+  /// Reveals one correct letter in a random unrevealed position of the
+  /// current row and locks that tile. Typed letters are cleared so the
+  /// revealed letter stands alone as the row's anchor. Consumes a free
+  /// hint first, then a banked hint. Returns false when no hint could
+  /// be applied.
   Future<bool> useHint() async {
-    if (_hints <= 0 || isFinished) return false;
-    final cur = _split(current);
-    // Find positions not yet correctly filled in the current row.
+    if (isFinished) return false;
+    if (_freeHints <= 0 && _hints <= 0) return false;
+    final rowLetters = _split(currentRow);
+    final candidates = <int>[];
     for (var i = 0; i < _answerLetters.length; i++) {
-      final already = i < cur.length ? cur[i] : null;
-      if (already != _answerLetters[i]) {
-        // Fill this position with the correct letter.
-        final letters = List<String>.from(cur);
-        while (letters.length <= i) {
-          letters.add('');
-        }
-        letters[i] = _answerLetters[i];
-        current = letters.join();
-        await _setHints(_hints - 1);
-        return true;
+      final have = i < rowLetters.length ? rowLetters[i] : ' ';
+      if (have != _answerLetters[i] && !hintLocks.containsKey(i)) {
+        candidates.add(i);
       }
     }
-    return false;
+    if (candidates.isEmpty) return false;
+    final pos = candidates[Random().nextInt(candidates.length)];
+    hintLocks[pos] = _answerLetters[pos];
+    current = '';
+    _toast = null;
+    if (_freeHints > 0) {
+      await _setFreeHints(_freeHints - 1);
+    } else {
+      await _setHints(_hints - 1);
+    }
+    return true;
   }
 
   /// +1 hint after watching a rewarded ad.
