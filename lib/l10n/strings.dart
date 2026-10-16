@@ -291,6 +291,7 @@ class S {
       '¡Racha perdida — juega hoy!'
     ],
     'balance': ['Balance', 'بیلنس', 'الرصيد', 'Saldo'],
+    'wins': ['Wins', 'جیت', 'الفوز', 'Victorias'],
     'youWonReward': [
       'You earned \$0.05!',
       'آپ نے \$0.05 جیتے!',
