@@ -203,13 +203,7 @@ class _GameViewState extends State<_GameView> {
               ),
             Text(
                 '${s.get('curStreak')}: ${stats.currentStreak}   •   ${s.get('played')}: ${stats.played}'),
-            if (game.mode == GameMode.daily && game.isWon && game.justEarned) ...[
-              const SizedBox(height: 8),
-              Text(
-                '🎉 ${s.get('youWonReward')}',
-                style: const TextStyle(fontWeight: FontWeight.w700),
-              ),
-            ],
+            // EARNING DISABLED (interim build): no reward message shown.
             if (game.mode == GameMode.practice && game.isWon) ...[
               const SizedBox(height: 8),
               Text(s.get('practiceEarnsNothing'),
