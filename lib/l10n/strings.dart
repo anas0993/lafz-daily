@@ -1016,6 +1016,318 @@ class S {
       'عملات',
       'Monedas',
     ],
+    'soundSettings': [
+      'Sound',
+      'آواز',
+      'الصوت',
+      'Sonido',
+    ],
+    'classic': [
+      'Classic',
+      'کلاسک',
+      'كلاسيكي',
+      'Clásico',
+    ],
+    'classicSub': [
+      'Guess the 5-letter word',
+      'پانچ حرفی لفظ پہچانیں',
+      'خمّن الكلمة من ٥ أحرف',
+      'Adivina la palabra de 5 letras',
+    ],
+    'dailyPuzzle': [
+      'Daily Puzzle',
+      'روزانہ پہیلی',
+      'اللغز اليومي',
+      'Puzzle diario',
+    ],
+    'dailyPuzzleSub': [
+      'Fresh puzzles every day',
+      'ہر روز نئی پہیلیاں',
+      'ألغاز جديدة كل يوم',
+      'Puzzles nuevos cada día',
+    ],
+    'wordFever': [
+      'Word Fever',
+      'ورڈ فیور',
+      'حمى الكلمات',
+      'Fiebre de palabras',
+    ],
+    'wordFeverSub': [
+      'Race the clock, chain words',
+      'وقت کے خلاف الفاظ بنائیں',
+      'سابق الزمن واجمع الكلمات',
+      'Contra el reloj, encadena palabras',
+    ],
+    'best': [
+      'Best',
+      'بہترین',
+      'الأفضل',
+      'Mejor',
+    ],
+    'newBadge': [
+      'NEW',
+      'نیا',
+      'جديد',
+      'NUEVO',
+    ],
+    'submit': [
+      'SUBMIT',
+      'جمع کریں',
+      'إرسال',
+      'ENVIAR',
+    ],
+    'hintTip': [
+      'Hint: reveal a correct letter',
+      'اشارہ: ایک صحیح حرف ظاہر کریں',
+      'تلميح: اكشف حرفًا صحيحًا',
+      'Pista: revela una letra correcta',
+    ],
+    'dartTip': [
+      'Dart: remove a wrong letter',
+      'ڈارٹ: ایک غلط حرف ہٹائیں',
+      'السهم: أزل حرفًا خاطئًا',
+      'Dardo: elimina una letra incorrecta',
+    ],
+    'skipTip': [
+      'Skip: abandon this puzzle',
+      'چھوڑیں: یہ پہیلی چھوڑ دیں',
+      'تخطي: اترك هذا اللغز',
+      'Omitir: abandona este puzzle',
+    ],
+    'dartUsed': [
+      'A wrong letter is gone!',
+      'ایک غلط حرف ختم ہو گیا!',
+      'اختفى حرف خاطئ!',
+      '¡Una letra incorrecta eliminada!',
+    ],
+    'noDarts': [
+      'No darts left',
+      'ڈارٹ ختم ہو گئے',
+      'لا أسهم متبقية',
+      'No quedan dardos',
+    ],
+    'noSkips': [
+      'No skips left',
+      'اسکپ ختم ہو گئے',
+      'لا تخطيات متبقية',
+      'No quedan omisiones',
+    ],
+    'dartLatinOnly': [
+      'Dart works in English & Spanish for now',
+      'ڈارٹ فی الحال انگریزی اور ہسپانوی میں کام کرتا ہے',
+      'السهم يعمل بالإنجليزية والإسبانية حاليًا',
+      'El dardo funciona en inglés y español por ahora',
+    ],
+    'skipTitle': [
+      'Skip this puzzle?',
+      'یہ پہیلی چھوڑ دیں؟',
+      'تخطي هذا اللغز؟',
+      '¿Omitir este puzzle?',
+    ],
+    'skipMsg': [
+      'You will leave this puzzle unfinished.',
+      'آپ یہ پہیلی ادھوری چھوڑ دیں گے۔',
+      'ستترك هذا اللغز غير مكتمل.',
+      'Dejarás este puzzle sin terminar.',
+    ],
+    'skipYes': [
+      'Skip',
+      'چھوڑیں',
+      'تخطي',
+      'Omitir',
+    ],
+    'puzzleSkipped': [
+      'Puzzle skipped',
+      'پہیلی چھوڑ دی گئی',
+      'تم تخطي اللغز',
+      'Puzzle omitido',
+    ],
+    'difficulty': [
+      'Difficulty',
+      'مشکل کی سطح',
+      'الصعوبة',
+      'Dificultad',
+    ],
+    'buy': [
+      'Buy',
+      'خریدیں',
+      'شراء',
+      'Comprar',
+    ],
+    'buyFor': [
+      'Buy one for',
+      'کے لیے ایک خریدیں',
+      'اشترِ واحدًا مقابل',
+      'Comprar uno por',
+    ],
+    'easy': [
+      'Easy',
+      'آسان',
+      'سهل',
+      'Fácil',
+    ],
+    'normal': [
+      'Normal',
+      'معمول',
+      'عادي',
+      'Normal',
+    ],
+    'hard': [
+      'Hard',
+      'مشکل',
+      'صعب',
+      'Difícil',
+    ],
+    'music': [
+      'Music',
+      'موسیقی',
+      'الموسيقى',
+      'Música'
+    ],
+    'soundEffects': [
+      'Sound effects',
+      'صوتی اثرات',
+      'المؤثرات الصوتية',
+      'Efectos de sonido'
+    ],
+    'difficultyEasy': [
+      'Easy', 'آسان', 'سهل', 'Fácil'
+    ],
+    'difficultyNormal': [
+      'Normal', 'معمول', 'عادي', 'Normal'
+    ],
+    'difficultyHard': [
+      'Hard', 'مشکل', 'صعب', 'Difícil'
+    ],
+    'hardModeHint': [
+      'Revealed hints must be used in every guess',
+      'ظاہر شدہ اشارے ہر اندازے میں استعمال کریں',
+      'يجب استخدام التلميحات المكشوفة في كل محاولة',
+      'Debes usar las pistas reveladas en cada intento'
+    ],
+    'pickDate': [
+      'Pick a date', 'تاریخ منتخب کریں', 'اختر تاريخًا', 'Elige una fecha'
+    ],
+    'archiveHint': [
+      'Replay any past daily puzzle. Replays never change today\'s game or streak.',
+      'کسی بھی پرانی روزانہ پہیلی کو دوبارہ کھیلیں۔ دوبارہ کھیلنے سے آج کا کھیل یا سلسلہ متاثر نہیں ہوتا۔',
+      'أعد لعب أي لغز يومي سابق. الإعادات لا تغيّر لعبة اليوم أو السلسلة.',
+      'Repite cualquier reto diario anterior. Las repeticiones no cambian tu juego ni tu racha de hoy.'
+    ],
+    'streakCalendar': [
+      'Streak Calendar', 'سلسلہ کیلنڈر', 'تقويم السلسلة', 'Calendario de racha'
+    ],
+    'dayWin': [
+      'Win', 'جیت', 'فوز', 'Victoria'
+    ],
+    'dayLoss': [
+      'Loss', 'ہار', 'خسارة', 'Derrota'
+    ],
+    'dayNotPlayed': [
+      'Not played', 'نہیں کھیلا', 'لم يُلعب', 'Sin jugar'
+    ],
+    'wfTitle': [
+      'Word Fever',
+      'ورڈ فیور',
+      'حمى الكلمات',
+      'Fiebre de palabras',
+    ],
+    'wfSubtitle': [
+      '60-second word sprint',
+      '60 سیکنڈ کا لفظی مقابلہ',
+      'سباق الكلمات لمدة 60 ثانية',
+      'Sprint de palabras de 60 segundos',
+    ],
+    'wfScore': [
+      'SCORE',
+      'اسکور',
+      'النقاط',
+      'PUNTOS',
+    ],
+    'wfBest': [
+      'BEST',
+      'بہترین',
+      'الأفضل',
+      'RÉCORD',
+    ],
+    'wfSkip': [
+      'Skip',
+      'چھوڑیں',
+      'تخطَّ',
+      'Saltar',
+    ],
+    'wfNoSkips': [
+      'No skips left',
+      'کوئی اسکپ باقی نہیں',
+      'لا توجد تخطيات متبقية',
+      'No quedan saltos',
+    ],
+    'wfBuySkip': [
+      'Buy a skip for {n} coins?',
+      'کیا {n} سکوں میں ایک اسکپ خریدیں؟',
+      'شراء تخطٍّ مقابل {n} عملة؟',
+      '¿Comprar un salto por {n} monedas?',
+    ],
+    'wfBuy': [
+      'BUY',
+      'خریدیں',
+      'شراء',
+      'COMPRAR',
+    ],
+    'wfNotEnoughCoins': [
+      'Not enough coins',
+      'سکے ناکافی ہیں',
+      'لا توجد عملات كافية',
+      'Monedas insuficientes',
+    ],
+    'wfTimeUp': [
+      "Time's up!",
+      'وقت ختم!',
+      'انتهى الوقت!',
+      '¡Tiempo agotado!',
+    ],
+    'wfWordsSolved': [
+      'words solved',
+      'الفاظ حل ہوئے',
+      'كلمات تم حلها',
+      'palabras resueltas',
+    ],
+    'wfNewBest': [
+      'NEW BEST!',
+      'نیا ریکارڈ!',
+      'رقم قياسي جديد!',
+      '¡NUEVO RÉCORD!',
+    ],
+    'wfPlayAgain': [
+      'Play again',
+      'دوبارہ کھیلیں',
+      'العب مجددًا',
+      'Jugar de nuevo',
+    ],
+    'wfGoHome': [
+      'Home',
+      'ہوم',
+      'الرئيسية',
+      'Inicio',
+    ],
+    'wfSolved': [
+      'Solved! +5 coins',
+      'حل ہو گیا! +5 سکے',
+      'أُحِلَّت! +5 عملات',
+      '¡Resuelto! +5 monedas',
+    ],
+    'wfOutOfGuesses': [
+      'The word was {w}',
+      'لفظ تھا: {w}',
+      'كانت الكلمة: {w}',
+      'La palabra era: {w}',
+    ],
+    'wfTapToStart': [
+      'Solve as many 5-letter words as you can!',
+      'جتنے ہو سکیں، اتنے 5 حرفی الفاظ حل کریں!',
+      'احْلُلْ أكبر عدد ممكن من الكلمات ذات الخمسة أحرف!',
+      '¡Resuelve tantas palabras de 5 letras como puedas!',
+    ],
   };
 
 

@@ -7,6 +7,9 @@ import '../services/notification_service.dart';
 import '../services/share_service.dart';
 import '../services/storage_service.dart';
 import '../config/app_config.dart';
+import '../widgets/animated_background.dart';
+import '../widgets/wood_theme.dart';
+import '../widgets/audio_settings.dart';
 import 'how_to_play_screen.dart';
 import 'premium_screen.dart';
 
@@ -31,9 +34,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final s = appState.s;
 
     return Scaffold(
-      appBar: AppBar(title: Text(s.get('settings'))),
-      body: ListView(
-        children: [
+      appBar: AppBar(
+        title: Text(s.get('settings')),
+        backgroundColor: WoodTheme.emerald,
+        foregroundColor: WoodTheme.cream,
+      ),
+      body: AnimatedBackground(
+        child: ListView(
+          children: [
           // Language
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -123,10 +131,29 @@ class _SettingsScreenState extends State<SettingsScreen> {
             onTap: _reminderOn ? () => _pickTime(context) : null,
           ),
           const Divider(),
+          // -------------------------------------------------- Sound --
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Row(
+              children: [
+                const Icon(Icons.volume_up_rounded),
+                const SizedBox(width: 12),
+                Text(
+                  s.get('soundSettings'),
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const AudioSettingsSection(),
+          const Divider(),
           // Premium
           ListTile(
             leading: const Icon(Icons.workspace_premium_rounded,
-                color: Colors.amber),
+                color: WoodTheme.gold),
             title: Text(s.get('premiumTitle')),
             subtitle: Text(s.get('premiumFeatures')),
             trailing: const Icon(Icons.chevron_right_rounded),
@@ -178,7 +205,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       Theme.of(context).colorScheme.onSurfaceVariant),
             ),
           ),
-        ],
+          ],
+        ),
       ),
     );
   }

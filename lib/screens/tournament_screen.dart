@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../main.dart';
 import '../services/rewards_service.dart';
+import '../widgets/animated_background.dart';
+import '../widgets/wood_theme.dart';
 
 /// Weekly tournament overview (local-only ranking).
 ///
@@ -32,10 +34,15 @@ class TournamentScreen extends StatelessWidget {
     final toNext = RewardsService.winsToNextTier(weekWins);
 
     return Scaffold(
-      appBar: AppBar(title: Text(s.get('tournament'))),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Column(
+      appBar: AppBar(
+        title: Text(s.get('tournament')),
+        backgroundColor: WoodTheme.emerald,
+        foregroundColor: WoodTheme.cream,
+      ),
+      body: AnimatedBackground(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(20),
+          child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             // Rank card.
@@ -70,9 +77,9 @@ class TournamentScreen extends StatelessWidget {
                           ? s.get('playMoreToRankUp')
                           : '💎',
                       textAlign: TextAlign.center,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 13,
-                        color: scheme.tertiary,
+                        color: WoodTheme.gold,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -125,6 +132,7 @@ class TournamentScreen extends StatelessWidget {
               ),
             ),
           ],
+          ),
         ),
       ),
     );

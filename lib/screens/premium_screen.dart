@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../main.dart';
 import '../services/billing_service.dart';
+import '../widgets/animated_background.dart';
+import '../widgets/wood_theme.dart';
 
 /// Premium via Google Play Billing.
 /// Products: premium_3mo ($10), premium_6mo ($15)
@@ -40,16 +42,22 @@ class _PremiumScreenState extends State<PremiumScreen> {
     final scheme = Theme.of(context).colorScheme;
 
     return Scaffold(
-      appBar: AppBar(title: Text(s.get('premiumTitle'))),
-      body: ValueListenableBuilder<bool>(
-        valueListenable: billing.isPro,
+      appBar: AppBar(
+        title: Text(s.get('premiumTitle')),
+        backgroundColor: WoodTheme.emerald,
+        foregroundColor: WoodTheme.cream,
+      ),
+      body: AnimatedBackground(
+        child: ValueListenableBuilder<bool>(
+          valueListenable: billing.isPro,
         builder: (context, isPro, _) => SingleChildScrollView(
           padding: const EdgeInsets.all(24),
           child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             // Header
-            Icon(Icons.workspace_premium_rounded, size: 80, color: Colors.amber.shade700),
+            const Icon(Icons.workspace_premium_rounded,
+                size: 80, color: WoodTheme.gold),
             const SizedBox(height: 16),
             Text(
               s.get('premiumTitle'),
@@ -68,13 +76,14 @@ class _PremiumScreenState extends State<PremiumScreen> {
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: Colors.green.shade50,
+                  color: WoodTheme.lighten(WoodTheme.emerald, 0.82),
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.green.shade200),
+                  border: Border.all(
+                      color: WoodTheme.emerald.withValues(alpha: 0.4)),
                 ),
                 child: Row(
                   children: [
-                    Icon(Icons.check_circle, color: Colors.green.shade700),
+                    const Icon(Icons.check_circle, color: WoodTheme.emerald),
                     const SizedBox(width: 12),
                     Expanded(child: Text(s.get('proActive'), style: const TextStyle(fontWeight: FontWeight.w600))),
                   ],
@@ -123,6 +132,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
             ],
           ),
         ),
+        ),
       ),
     );
   }
@@ -164,8 +174,8 @@ class _PlanCard extends StatelessWidget {
                 if (badge != null)
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                    decoration: BoxDecoration(color: Colors.amber.shade700, borderRadius: BorderRadius.circular(8)),
-                    child: Text(badge!, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Colors.white)),
+                    decoration: BoxDecoration(color: WoodTheme.gold, borderRadius: BorderRadius.circular(8)),
+                    child: Text(badge!, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: WoodTheme.bark)),
                   ),
               ],
             ),
@@ -245,13 +255,13 @@ class _OtherPaymentOptionsState extends State<_OtherPaymentOptions> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _PaymentRow(
+                const _PaymentRow(
                   icon: Icons.currency_bitcoin_rounded,
                   label: 'Binance (USDT)',
                   value: 'UID: 123456789',
                 ),
                 const SizedBox(height: 10),
-                _PaymentRow(
+                const _PaymentRow(
                   icon: Icons.phone_android_rounded,
                   label: 'Easypaisa',
                   value: '0345-1234567',

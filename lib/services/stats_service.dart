@@ -16,6 +16,11 @@ class Stats {
   String lastPlayedDate = ''; // dateKey of last daily game
   String lastWinDate = ''; // dateKey of last daily WIN (drives the streak)
 
+  /// WS4 (v4.1), additive: per-day daily-puzzle outcome for the streak
+  /// calendar. dateKey -> 1 (at least one win that day) / 0 (losses only).
+  /// A win is never overwritten by a later loss on the same day.
+  final Map<String, int> dayResults = {};
+
   Stats();
 
   Stats.fromJson(Map<String, dynamic> j) {
@@ -29,6 +34,13 @@ class Stats {
     }
     lastPlayedDate = (j['lastPlayedDate'] as String?) ?? '';
     lastWinDate = (j['lastWinDate'] as String?) ?? '';
+    final dr = j['dayResults'] as Map?;
+    if (dr != null) {
+      for (final e in dr.entries) {
+        final v = (e.value as num?)?.toInt();
+        if (v != null && (v == 0 || v == 1)) dayResults['${e.key}'] = v;
+      }
+    }
   }
 
   Map<String, dynamic> toJson() => {
@@ -39,6 +51,7 @@ class Stats {
         'distribution': distribution,
         'lastPlayedDate': lastPlayedDate,
         'lastWinDate': lastWinDate,
+        'dayResults': dayResults,
       };
 
   double get winPct => played == 0 ? 0 : wins / played * 100;
@@ -80,6 +93,12 @@ class StatsService extends ChangeNotifier {
       if (guesses >= 1 && guesses <= 6) s.distribution[guesses - 1]++;
     }
     if (isDaily && dateKey != null) {
+      // WS4 (v4.1): additive per-day outcome for the streak calendar.
+      if (won) {
+        s.dayResults[dateKey] = 1;
+      } else {
+        s.dayResults.putIfAbsent(dateKey, () => 0);
+      }
       final todayKey = Puzzle.dateKey(DateTime.now());
       if (dateKey == todayKey) {
         // Streak = consecutive days with at least one daily WIN. With five

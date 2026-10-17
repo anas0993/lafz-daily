@@ -4,6 +4,8 @@ import '../game/lang_utils.dart';
 import '../main.dart';
 import '../services/backend_service.dart';
 import '../services/storage_service.dart';
+import '../widgets/animated_background.dart';
+import '../widgets/wood_theme.dart';
 import 'home_screen.dart';
 import 'name_entry_screen.dart';
 import 'how_to_play_screen.dart';
@@ -26,11 +28,12 @@ class AppLogo extends StatelessWidget {
         gradient: const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Color(0xFF0F766E), Color(0xFF14B8A6)],
+          colors: [WoodTheme.emerald, WoodTheme.emeraldDeep],
         ),
+        border: Border.all(color: WoodTheme.gold, width: 3),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF0F766E).withValues(alpha: 0.35),
+            color: WoodTheme.emeraldDeep.withValues(alpha: 0.35),
             blurRadius: 18,
             offset: const Offset(0, 8),
           ),
@@ -86,21 +89,23 @@ class _SplashScreenState extends State<SplashScreen> {
     final s = appState.s;
     final name = AppConfig.appName(appState.lang);
     return Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const AppLogo(size: 96),
-            const SizedBox(height: 20),
-            Text(name,
-                style: const TextStyle(
-                    fontSize: 34, fontWeight: FontWeight.w800)),
-            const SizedBox(height: 6),
-            Text(s.get('tagline'),
-                style: TextStyle(
-                    fontSize: 16,
-                    color: Theme.of(context).colorScheme.onSurfaceVariant)),
-          ],
+      body: AnimatedBackground(
+        child: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const AppLogo(size: 96),
+              const SizedBox(height: 20),
+              Text(name,
+                  style: const TextStyle(
+                      fontSize: 34, fontWeight: FontWeight.w800)),
+              const SizedBox(height: 6),
+              Text(s.get('tagline'),
+                  style: TextStyle(
+                      fontSize: 16,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant)),
+            ],
+          ),
         ),
       ),
     );

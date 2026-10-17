@@ -4,6 +4,8 @@ import 'package:provider/provider.dart';
 import '../l10n/strings.dart';
 import '../main.dart';
 import '../services/team_service.dart';
+import '../widgets/animated_background.dart';
+import '../widgets/wood_theme.dart';
 
 /// Team/clan screen (Workstream 5: Social). Local-only for now.
 ///
@@ -114,6 +116,8 @@ class _TeamScreenState extends State<TeamScreen> {
           return Scaffold(
             appBar: AppBar(
               title: Text(s.get('team')),
+              backgroundColor: WoodTheme.emerald,
+              foregroundColor: WoodTheme.cream,
               actions: [
                 if (team.inTeam)
                   IconButton(
@@ -123,7 +127,11 @@ class _TeamScreenState extends State<TeamScreen> {
                   ),
               ],
             ),
-            body: team.inTeam ? _buildBoard(context, s, scheme, team) : _buildJoinCreate(context, s, scheme),
+            body: AnimatedBackground(
+              child: team.inTeam
+                  ? _buildBoard(context, s, scheme, team)
+                  : _buildJoinCreate(context, s, scheme),
+            ),
           );
         },
       ),
@@ -138,7 +146,7 @@ class _TeamScreenState extends State<TeamScreen> {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Icon(Icons.groups, size: 72, color: scheme.primary),
+          const Icon(Icons.groups, size: 72, color: WoodTheme.emerald),
           const SizedBox(height: 16),
           Text(
             s.get('team'),
@@ -178,28 +186,37 @@ class _TeamScreenState extends State<TeamScreen> {
         Container(
           width: double.infinity,
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-          decoration: BoxDecoration(
-            color: scheme.primaryContainer,
-            borderRadius: const BorderRadius.vertical(bottom: Radius.circular(20)),
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [WoodTheme.emerald, WoodTheme.emeraldDeep],
+            ),
+            borderRadius:
+                BorderRadius.vertical(bottom: Radius.circular(20)),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 team.teamName ?? '',
-                style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w800),
+                style: const TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w800,
+                    color: WoodTheme.cream),
               ),
               const SizedBox(height: 4),
               Row(
                 children: [
-                  Icon(Icons.emoji_events, size: 18, color: scheme.onPrimaryContainer),
+                  const Icon(Icons.emoji_events,
+                      size: 18, color: WoodTheme.goldSoft),
                   const SizedBox(width: 6),
                   Text(
                     '${s.get('teamWins')}: ${team.teamWins}',
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
-                      color: scheme.onPrimaryContainer,
+                      color: WoodTheme.cream,
                     ),
                   ),
                 ],

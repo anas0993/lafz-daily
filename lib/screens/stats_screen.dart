@@ -3,6 +3,9 @@ import 'package:provider/provider.dart';
 import '../main.dart';
 import '../services/share_service.dart';
 import '../services/stats_service.dart';
+import '../widgets/animated_background.dart';
+import '../widgets/wood_theme.dart';
+import 'streak_calendar_screen.dart';
 
 class StatsScreen extends StatelessWidget {
   const StatsScreen({super.key});
@@ -15,10 +18,15 @@ class StatsScreen extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
 
     return Scaffold(
-      appBar: AppBar(title: Text(s.get('stats'))),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Column(
+      appBar: AppBar(
+        title: Text(s.get('stats')),
+        backgroundColor: WoodTheme.emerald,
+        foregroundColor: WoodTheme.cream,
+      ),
+      body: AnimatedBackground(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(20),
+          child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Row(
@@ -85,6 +93,16 @@ class StatsScreen extends StatelessWidget {
             }),
             const SizedBox(height: 24),
             OutlinedButton.icon(
+              icon: const Icon(Icons.calendar_month_rounded),
+              // WS4 (v4.1): navigation-only addition to the streak calendar.
+              label: Text(s.get('streakCalendar')),
+              onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute(
+                    builder: (_) => const StreakCalendarScreen()),
+              ),
+            ),
+            const SizedBox(height: 8),
+            OutlinedButton.icon(
               icon: const Icon(Icons.share_rounded),
               label: Text(s.get('share')),
               onPressed: () {
@@ -94,6 +112,7 @@ class StatsScreen extends StatelessWidget {
               },
             ),
           ],
+          ),
         ),
       ),
     );

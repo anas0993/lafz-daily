@@ -5,6 +5,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../l10n/strings.dart';
 import '../main.dart';
 import '../services/stats_service.dart';
+import '../widgets/animated_background.dart';
+import '../widgets/wood_theme.dart';
 
 /// Local leaderboard screen (Workstream 5: Social).
 ///
@@ -80,8 +82,13 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
     return Scaffold(
       appBar: AppBar(
         title: Text(s.get('leaderboard')),
+        backgroundColor: WoodTheme.emerald,
+        foregroundColor: WoodTheme.cream,
         bottom: TabBar(
           controller: _tabs,
+          indicatorColor: WoodTheme.gold,
+          labelColor: WoodTheme.cream,
+          unselectedLabelColor: WoodTheme.cream.withValues(alpha: 0.7),
           tabs: sections
               .map((sec) => Tab(
                     icon: Icon(sec.icon, size: 20),
@@ -93,7 +100,9 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
       body: TabBarView(
         controller: _tabs,
         children: sections
-            .map((sec) => _buildSection(context, s, sec))
+            .map((sec) => AnimatedBackground(
+                  child: _buildSection(context, s, sec),
+                ))
             .toList(),
       ),
     );

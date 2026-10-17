@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../main.dart';
 import '../services/backend_service.dart';
+import '../widgets/animated_background.dart';
+import '../widgets/wood_theme.dart';
 import 'home_screen.dart';
 
 /// First-launch name entry screen.
@@ -48,20 +50,20 @@ class _NameEntryScreenState extends State<NameEntryScreen> {
   Widget build(BuildContext context) {
     final appState = context.watch<AppState>();
     final s = appState.s;
-    final scheme = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: isDark
-                ? [const Color(0xFF1B5E20), const Color(0xFF0D3B1E)]
-                : [const Color(0xFF2E7D32), const Color(0xFF1B5E20)],
+      body: AnimatedBackground(
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: isDark
+                  ? [WoodTheme.emeraldDeep, WoodTheme.bark]
+                  : [WoodTheme.emerald, WoodTheme.emeraldDeep],
+            ),
           ),
-        ),
         child: SafeArea(
           child: Padding(
             padding: const EdgeInsets.all(32),
@@ -116,8 +118,8 @@ class _NameEntryScreenState extends State<NameEntryScreen> {
                 FilledButton(
                   onPressed: _saving ? null : _save,
                   style: FilledButton.styleFrom(
-                    backgroundColor: Colors.amber.shade700,
-                    foregroundColor: Colors.white,
+                    backgroundColor: WoodTheme.gold,
+                    foregroundColor: WoodTheme.bark,
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(14),
@@ -143,6 +145,7 @@ class _NameEntryScreenState extends State<NameEntryScreen> {
               ],
             ),
           ),
+        ),
         ),
       ),
     );

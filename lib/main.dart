@@ -7,6 +7,7 @@ import 'game/lang_utils.dart';
 import 'l10n/strings.dart';
 import 'screens/splash_screen.dart';
 import 'services/ads_service.dart';
+import 'services/audio_service.dart';
 import 'services/backend_service.dart';
 import 'services/billing_service.dart';
 import 'services/notification_service.dart';
@@ -70,6 +71,11 @@ Future<void> main() async {
     await NotificationService.instance.init();
   } catch (_) {}
 
+  // Audio (v4.1): best-effort; the game works silently if init fails.
+  try {
+    await AudioService.init();
+  } catch (_) {}
+
   runApp(
     MultiProvider(
       providers: [
@@ -80,6 +86,11 @@ Future<void> main() async {
       child: const WordDailyApp(),
     ),
   );
+
+  // Start background music after the first frame renders.
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    AudioService.startMusic();
+  });
 }
 
 class WordDailyApp extends StatelessWidget {

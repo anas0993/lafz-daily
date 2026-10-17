@@ -12,7 +12,9 @@ import '../services/achievements_service.dart';
 import '../services/coins_service.dart';
 import '../services/storage_service.dart';
 import '../widgets/ad_slot.dart';
+import '../widgets/animated_background.dart';
 import '../widgets/confetti_celebration.dart';
+import '../widgets/wood_theme.dart';
 
 /// Scramble mode: a random 5-letter answer word is shuffled and the player
 /// taps the tray letters to rebuild it in the slots.
@@ -219,9 +221,12 @@ class _ScrambleViewState extends State<_ScrambleView>
     return Scaffold(
       appBar: AppBar(
         title: Text(s.get('scramble')),
+        backgroundColor: WoodTheme.emerald,
+        foregroundColor: WoodTheme.cream,
       ),
-      body: SafeArea(
-        child: Stack(
+      body: AnimatedBackground(
+        child: SafeArea(
+          child: Stack(
           children: [
             Column(
               children: [
@@ -234,7 +239,7 @@ class _ScrambleViewState extends State<_ScrambleView>
                     color: scheme.surfaceContainerHighest,
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
-                        color: Colors.amber.withValues(alpha: 0.4)),
+                        color: WoodTheme.gold.withValues(alpha: 0.5)),
                   ),
                   child: Text(
                     '🏆 ×$_wins  •  ${s.get('scrambleWins')}',
@@ -264,7 +269,7 @@ class _ScrambleViewState extends State<_ScrambleView>
                           boxShadow: _won
                               ? [
                                   BoxShadow(
-                                    color: Colors.green.withValues(
+                                    color: WoodTheme.emerald.withValues(
                                         alpha: 0.3 + 0.45 * glow),
                                     blurRadius: 16 + 24 * glow,
                                     spreadRadius: 2,
@@ -306,7 +311,7 @@ class _ScrambleViewState extends State<_ScrambleView>
                             fontSize: 15,
                             fontWeight: FontWeight.w700,
                             color: _messageKey == 'scrambleWin'
-                                ? Colors.green
+                                ? WoodTheme.emerald
                                 : _messageKey == 'scrambleWrong'
                                     ? Colors.red
                                     : scheme.onSurfaceVariant,
@@ -367,6 +372,7 @@ class _ScrambleViewState extends State<_ScrambleView>
             if (_won) const ConfettiCelebration(),
           ],
         ),
+        ),
       ),
     );
   }
@@ -399,7 +405,7 @@ class _SlotTile extends StatelessWidget {
         margin: const EdgeInsets.symmetric(horizontal: 3),
         decoration: BoxDecoration(
           color: won
-              ? const Color(0xFF2E7D32)
+              ? WoodTheme.emerald
               : filled
                   ? scheme.primaryContainer
                   : scheme.surfaceContainerHighest,
@@ -456,7 +462,7 @@ class _TrayTile extends StatelessWidget {
           width: 58,
           height: 58,
           decoration: BoxDecoration(
-            color: used ? scheme.surfaceContainerHighest : const Color(0xFF5D4037),
+            color: used ? scheme.surfaceContainerHighest : WoodTheme.wood,
             borderRadius: BorderRadius.circular(10),
             boxShadow: used
                 ? null

@@ -5,6 +5,8 @@ import '../game/lang_utils.dart';
 import '../l10n/strings.dart';
 import '../main.dart';
 import '../services/storage_service.dart';
+import '../widgets/animated_background.dart';
+import '../widgets/wood_theme.dart';
 import 'home_screen.dart';
 
 /// First-launch tutorial + reference. Shows 3 example rows with
@@ -39,8 +41,10 @@ class HowToPlayScreen extends StatelessWidget {
                         const EdgeInsets.symmetric(horizontal: 2, vertical: 6),
                     decoration: BoxDecoration(
                       color: switch (states[i]) {
-                        LetterState.correct => const Color(0xFF4C9A52),
-                        LetterState.present => const Color(0xFFC9A227),
+                        // Wooden tiles: match the v4.0 game board —
+                        // dark wood for correct, medium wood for present.
+                        LetterState.correct => WoodTheme.wood,
+                        LetterState.present => WoodTheme.woodLight,
                         _ => scheme.surfaceContainerHighest,
                       },
                       border: Border.all(
@@ -74,10 +78,15 @@ class HowToPlayScreen extends StatelessWidget {
     // Original examples per language (shown below).
 
     return Scaffold(
-      appBar: AppBar(title: Text(s.get('howToPlay'))),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(22),
-        child: Column(
+      appBar: AppBar(
+        title: Text(s.get('howToPlay')),
+        backgroundColor: WoodTheme.emerald,
+        foregroundColor: WoodTheme.cream,
+      ),
+      body: AnimatedBackground(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(22),
+          child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(s.get('how1t'),
@@ -226,6 +235,7 @@ class HowToPlayScreen extends StatelessWidget {
               ),
             ),
           ],
+          ),
         ),
       ),
     );

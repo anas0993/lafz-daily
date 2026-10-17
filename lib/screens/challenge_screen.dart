@@ -6,6 +6,8 @@ import '../l10n/strings.dart';
 import '../main.dart';
 import '../services/challenge_service.dart';
 import '../services/share_service.dart';
+import '../widgets/animated_background.dart';
+import '../widgets/wood_theme.dart';
 
 /// 1v1 friend challenge screen (fully local).
 ///
@@ -116,10 +118,13 @@ class _ChallengeScreenState extends State<ChallengeScreen> {
       child: Scaffold(
         appBar: AppBar(
           title: Text(s.get('challengeTitle')),
+          backgroundColor: WoodTheme.emerald,
+          foregroundColor: WoodTheme.cream,
         ),
-        body: ListView(
-          padding: const EdgeInsets.all(16),
-          children: [
+        body: AnimatedBackground(
+          child: ListView(
+            padding: const EdgeInsets.all(16),
+            children: [
             // -------------------------------------------------- create --
             Card(
               child: Padding(
@@ -228,7 +233,8 @@ class _ChallengeScreenState extends State<ChallengeScreen> {
                 ),
               ),
             ),
-          ],
+            ],
+          ),
         ),
       ),
     );

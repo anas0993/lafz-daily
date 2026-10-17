@@ -9,6 +9,7 @@ import '../game/puzzle.dart';
 import '../l10n/strings.dart';
 import '../services/ads_service.dart';
 import '../services/billing_service.dart';
+import '../services/difficulty_service.dart';
 import '../services/game_settings.dart';
 import '../services/remote_content_service.dart';
 import '../services/share_service.dart';
@@ -73,8 +74,24 @@ class GameController extends ChangeNotifier {
   bool get isWon =>
       evaluations.isNotEmpty &&
       evaluations.last.every((s) => s == LetterState.correct);
-  bool get isLost => !isWon && rows.length >= AppConfig.maxAttempts;
+  // v4.1 WS2: _abandoned is set by abandon() (skip booster) — the puzzle
+  // counts as played-not-won.
+  bool _abandoned = false;
+  bool get isLost =>
+      !isWon && (rows.length >= AppConfig.maxAttempts || _abandoned);
   bool get isFinished => isWon || isLost;
+
+  /// v4.1 WS2: abandon the current puzzle (skip booster). Counts as
+  /// played-not-won: stats record a loss, the daily slot is marked done,
+  /// and the result dialog shows the answer.
+  Future<void> abandon() async {
+    if (isFinished) return;
+    _abandoned = true;
+    _toast = null;
+    notifyListeners();
+    await _save();
+    await _onFinished();
+  }
 
   String? _toast;
   String? get toast => _toast;
@@ -170,10 +187,19 @@ class GameController extends ChangeNotifier {
       notifyListeners();
       return;
     }
-    if (GameSettings.instance.hardMode) {
-      final violation = _hardModeViolation(guess);
+    // v4.1 WS2: hard mode enforced from the difficulty service
+    // (DifficultySelector) or the legacy settings toggle. The service's
+    // hardModeViolation returns an l10n key ('hardModeGreen' /
+    // 'hardModeYellow'); a non-null key rejects the guess with that message.
+    if (GameSettings.instance.hardMode ||
+        DifficultyService.instance.hardMode) {
+      final violation = DifficultyService.instance.hardModeViolation(
+        guess: guess,
+        fixedPositions: _fixedPositions(),
+        mustInclude: _mustIncludeLetters(),
+      );
       if (violation != null) {
-        _toast = violation == 'green' ? s.get('hardModeGreen') : s.get('hardModeYellow');
+        _toast = s.get(violation);
         notifyListeners();
         return;
       }
@@ -201,27 +227,28 @@ class GameController extends ChangeNotifier {
     }
   }
 
-  String? _hardModeViolation(String guess) {
-    final guessLetters = _split(guess);
-    final requiredPositions = <int, String>{};
-    final requiredLetters = <String>{};
+  /// Positions revealed green in previous guesses (must stay put).
+  Map<int, String> _fixedPositions() {
+    final map = <int, String>{};
     for (var r = 0; r < rows.length; r++) {
       final letters = _split(rows[r]);
       for (var i = 0; i < letters.length; i++) {
-        if (evaluations[r][i] == LetterState.correct) {
-          requiredPositions[i] = letters[i];
-        } else if (evaluations[r][i] == LetterState.present) {
-          requiredLetters.add(letters[i]);
-        }
+        if (evaluations[r][i] == LetterState.correct) map[i] = letters[i];
       }
     }
-    for (final e in requiredPositions.entries) {
-      if (guessLetters[e.key] != e.value) return 'green';
+    return map;
+  }
+
+  /// Letters revealed yellow in previous guesses (must be included).
+  Set<String> _mustIncludeLetters() {
+    final set = <String>{};
+    for (var r = 0; r < rows.length; r++) {
+      final letters = _split(rows[r]);
+      for (var i = 0; i < letters.length; i++) {
+        if (evaluations[r][i] == LetterState.present) set.add(letters[i]);
+      }
     }
-    for (final letter in requiredLetters) {
-      if (!guessLetters.contains(letter)) return 'yellow';
-    }
-    return null;
+    return set;
   }
 
   void _rebuildKeyStates() {

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../main.dart';
 import '../services/achievements_service.dart';
+import '../widgets/animated_background.dart';
+import '../widgets/wood_theme.dart';
 
 /// Shows every achievement with its locked/unlocked state.
 ///
@@ -21,10 +23,15 @@ class AchievementsScreen extends StatelessWidget {
     final unlocked = items.where((a) => a.unlocked).length;
 
     return Scaffold(
-      appBar: AppBar(title: Text(s.get('achievements'))),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
+      appBar: AppBar(
+        title: Text(s.get('achievements')),
+        backgroundColor: WoodTheme.emerald,
+        foregroundColor: WoodTheme.cream,
+      ),
+      body: AnimatedBackground(
+        child: ListView(
+          padding: const EdgeInsets.all(16),
+          children: [
           // Progress header.
           Card(
             child: Padding(
@@ -68,6 +75,7 @@ class AchievementsScreen extends StatelessWidget {
                 unlockedLabel: s.get('achUnlocked'),
               )),
         ],
+        ),
       ),
     );
   }
@@ -133,10 +141,10 @@ class _AchievementTile extends StatelessWidget {
                       )),
                   const SizedBox(height: 4),
                   Text('+${state.def.coins} $coinsLabel',
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w700,
-                        color: scheme.tertiary,
+                        color: WoodTheme.gold,
                       )),
                 ],
               ),
