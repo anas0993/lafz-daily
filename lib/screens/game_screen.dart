@@ -21,7 +21,7 @@ import '../services/stats_service.dart';
 import '../services/team_service.dart';
 import '../state/game_controller.dart';
 import '../widgets/ad_slot.dart';
-import '../widgets/animated_background.dart';
+import '../widgets/scene_background.dart';
 import '../widgets/boosters_row.dart';
 import '../widgets/confetti_celebration.dart';
 import '../widgets/difficulty_selector.dart';
@@ -393,8 +393,10 @@ class _GameViewState extends State<_GameView> with TickerProviderStateMixin {
           ),
         ],
       ),
-      // v4: animated wooden-luxury background behind the game.
-      body: AnimatedBackground(
+      // v4.2: illustrated scene background behind the game.
+      body: SceneBackground(
+        asset: 'assets/images/bg_game.png',
+        scrimOpacity: 0.62,
         child: SafeArea(
         child: Column(
           children: [

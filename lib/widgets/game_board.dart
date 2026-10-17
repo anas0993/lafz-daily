@@ -158,13 +158,14 @@ class _TileState extends State<_Tile> with SingleTickerProviderStateMixin {
   Color _bgFor(LetterState state) {
     final colorBlind = GameSettings.instance.colorBlind;
     return switch (state) {
-      // Wooden theme - warm natural wood colors
+      // v4.2: core Wordle feedback — correct MUST read as GREEN and
+      // present MUST read as YELLOW (matches GameKeyboard mapping).
       LetterState.correct => colorBlind
-          ? const Color(0xFF8D6E63)
-          : const Color(0xFF5D4037), // Rich dark wood
+          ? const Color(0xFFFF6B35) // color-blind: vivid orange
+          : WoodTheme.emerald, // rich green
       LetterState.present => colorBlind
-          ? const Color(0xFFBCAAA4)
-          : const Color(0xFFA1887F), // Warm medium wood
+          ? const Color(0xFF40C4FF) // color-blind: light blue
+          : WoodTheme.gold, // warm golden yellow
       LetterState.absent => const Color(0xFF4E342E), // Dark weathered wood
       LetterState.unknown => widget.filled
           ? const Color(0xFFD7CCC8)
@@ -176,7 +177,12 @@ class _TileState extends State<_Tile> with SingleTickerProviderStateMixin {
     if (state == LetterState.unknown) {
       return const Color(0xFF3E2723); // Dark wood text on light wood
     }
-    return const Color(0xFFFFF8E1); // Cream text on dark wood
+    // v4.2: dark text on the bright gold (present) tiles, cream on the
+    // dark green/brown tiles — matches the keyboard's contrast mapping.
+    if (state == LetterState.present) {
+      return WoodTheme.bark;
+    }
+    return const Color(0xFFFFF8E1); // Cream text on dark tiles
   }
 
   /// 3D-looking wooden tile face: vertical gradient + soft shadow, with a

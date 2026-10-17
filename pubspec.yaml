@@ -1,7 +1,7 @@
 name: word_daily
 description: "Word Daily — a daily word puzzle game in English, Urdu, Arabic and Spanish."
 publish_to: "none"
-version: 1.0.0+5
+version: 1.0.0+6
 
 environment:
   sdk: ^3.4.0
@@ -27,3 +27,4 @@ flutter:
 
   assets:
     - assets/audio/
+    - assets/images/

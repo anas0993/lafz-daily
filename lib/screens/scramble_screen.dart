@@ -12,7 +12,7 @@ import '../services/achievements_service.dart';
 import '../services/coins_service.dart';
 import '../services/storage_service.dart';
 import '../widgets/ad_slot.dart';
-import '../widgets/animated_background.dart';
+import '../widgets/scene_background.dart';
 import '../widgets/confetti_celebration.dart';
 import '../widgets/wood_theme.dart';
 
@@ -224,7 +224,9 @@ class _ScrambleViewState extends State<_ScrambleView>
         backgroundColor: WoodTheme.emerald,
         foregroundColor: WoodTheme.cream,
       ),
-      body: AnimatedBackground(
+      body: SceneBackground(
+        asset: 'assets/images/bg_scramble.png',
+        scrimOpacity: 0.55,
         child: SafeArea(
           child: Stack(
           children: [

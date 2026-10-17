@@ -596,6 +596,12 @@ class S {
       'تحدَّ صديقًا',
       'Desafía a un amigo',
     ],
+    'challengeBannerSub': [
+      'Play with friends!',
+      'دوستوں کے ساتھ کھیلیں!',
+      'العب مع أصدقائك!',
+      '¡Juega con amigos!',
+    ],
     'createChallenge': [
       'Create a challenge',
       'چیلنج بنائیں',
@@ -1039,6 +1045,12 @@ class S {
       'روزانہ پہیلی',
       'اللغز اليومي',
       'Puzzle diario',
+    ],
+    'dailyPuzzleSub': [
+      'A fresh word every day',
+      'روز ایک نیا لفظ',
+      'كلمة جديدة كل يوم',
+      'Una palabra nueva cada día',
     ],
     'dailyPuzzleSub': [
       'Fresh puzzles every day',
