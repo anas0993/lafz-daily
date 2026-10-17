@@ -1052,12 +1052,6 @@ class S {
       'كلمة جديدة كل يوم',
       'Una palabra nueva cada día',
     ],
-    'dailyPuzzleSub': [
-      'Fresh puzzles every day',
-      'ہر روز نئی پہیلیاں',
-      'ألغاز جديدة كل يوم',
-      'Puzzles nuevos cada día',
-    ],
     'wordFever': [
       'Word Fever',
       'ورڈ فیور',
